@@ -464,6 +464,8 @@ function weekKey(d0=new Date()){ const d=new Date(Date.UTC(d0.getFullYear(),d0.g
   const y=d.getUTCFullYear(), w=Math.ceil(((d-Date.UTC(y,0,1))/86400000+1)/7); return y+String(w).padStart(2,'0'); }
 function yesterdayKey(){ const d=new Date(); d.setDate(d.getDate()-1); return dayKey(d); }
 function xpNeed(lv){ return Math.round(500*Math.pow(1.15,lv-1)); }
+// 新ボスが出てくるようになるレベル（12体ぶん）
+const BOSS_LV=[1,2,3,4,6,8,10,12,14,16,18,21];
 function levelInfo(xp){ let lv=1,rest=xp; while(rest>=xpNeed(lv)){ rest-=xpNeed(lv); lv++; } return {lv,cur:rest,need:xpNeed(lv)}; }
 function displayName(s){ return (s.name||'').trim()||('ななし職人'+s.pid.slice(0,3)); }
 
@@ -593,21 +595,37 @@ const SKINS=[
   { id:'dots',    name:'水玉',             rar:'N' },
   { id:'zigzag',  name:'チョコがけ',       rar:'N' },
   { id:'toast',   name:'こんがり',         rar:'N' },
+  { id:'matcha',  name:'抹茶',             rar:'N' },
+  { id:'caramel', name:'キャラメル',       rar:'N' },
+  { id:'vanilla', name:'バニラ',           rar:'N' },
+  { id:'cocoa',   name:'ココアパウダー',   rar:'N' },
   { id:'sprinkle',name:'カラースプレー',   rar:'R' },
   { id:'pinkdots',name:'いちご水玉',       rar:'R' },
   { id:'mint',    name:'ミントビスケット', rar:'R' },
   { id:'checker', name:'チェック',         rar:'R' },
+  { id:'hearts',  name:'ハート',           rar:'R' },
+  { id:'lemon',   name:'レモンしましま',   rar:'R' },
+  { id:'berry',   name:'ブルーベリー',     rar:'R' },
+  { id:'cookie',  name:'クッキー＆クリーム', rar:'R' },
+  { id:'ripple',  name:'さざなみ',         rar:'R' },
   { id:'stars',   name:'星くず',           rar:'SR' },
   { id:'zebra',   name:'ゼブラ',           rar:'SR' },
   { id:'candy',   name:'キャンディ',       rar:'SR' },
   { id:'sakura',  name:'桜ふぶき',         rar:'SR' },
+  { id:'aurora',  name:'オーロラ',         rar:'SR' },
+  { id:'neon',    name:'ネオンサイン',     rar:'SR' },
+  { id:'marble',  name:'マーブル',         rar:'SR' },
+  { id:'firework',name:'花火',             rar:'SR' },
   { id:'gold',    name:'金箔ビスケット',   rar:'SSR' },
   { id:'rainbow', name:'レインボー',       rar:'SSR' },
   { id:'galaxy',  name:'銀河',             rar:'SSR' },
+  { id:'diamond', name:'ダイヤモンド',     rar:'SSR' },
+  { id:'phoenix', name:'不死鳥の炎',       rar:'SSR' },
+  { id:'royal',   name:'王家のロイヤル',   rar:'SSR' },
 ];
-const RARITY={ N:{rate:60,col:'#C8D2DA',refund:10,label:'ノーマル'}, R:{rate:28,col:'#3AB0FF',refund:25,label:'レア'}, SR:{rate:10,col:'#B05AFF',refund:60,label:'スーパーレア'}, SSR:{rate:2,col:'#FFC83A',refund:200,label:'ウルトラレア'} };
+const RARITY={ N:{rate:62,col:'#C8D2DA',refund:10,label:'ノーマル'}, R:{rate:28,col:'#3AB0FF',refund:25,label:'レア'}, SR:{rate:9,col:'#B05AFF',refund:60,label:'スーパーレア'}, SSR:{rate:1,col:'#FFC83A',refund:200,label:'ウルトラレア'} };
 const GACHA_COST=150, GACHA10_COST=1350, PITY_MAX=80;
-function rollRarity(minSR){ if(minSR){ return Math.random()<2/12?'SSR':'SR'; } let t=Math.random()*100; for(const k of ['SSR','SR','R','N']){ t-=RARITY[k].rate; if(t<=0) return k; } return 'N'; }
+function rollRarity(minSR){ if(minSR){ return Math.random()<0.05?'SSR':'SR'; } let t=Math.random()*100; for(const k of ['SSR','SR','R','N']){ t-=RARITY[k].rate; if(t<=0) return k; } return 'N'; }
 // ガチャを引く（天井あり）。結果と、更新したデータを返す
 function pullGacha(s,n){
   const out=[];
@@ -722,7 +740,8 @@ const ACH = [
   A('ssr1','ガチャ','虹のカプセル','ウルトラレアを引く',1,S=>S.ssrGet),
   A('ssr5','ガチャ','強運コレクター','ウルトラレアを5回引く',5,S=>S.ssrGet),
   A('sk8','ガチャ','おしゃれ職人','着せ替えを8種類集める',8,S=>S.skinCount),
-  A('skall','ガチャ','着せ替えコンプリート','着せ替えを16種類すべて集める',16,S=>S.skinCount),
+  A('sk16','ガチャ','着せ替えコレクター','着せ替えを16種類集める',16,S=>S.skinCount),
+  A('skall','ガチャ','着せ替えコンプリート','着せ替えを32種類すべて集める',32,S=>S.skinCount),
   A('cn5k','ガチャ','小金持ち','コインを合計5,000枚かせぐ',5000,S=>S.coinsEarned),
   A('cn50k','ガチャ','チョコ長者','コインを合計50,000枚かせぐ',50000,S=>S.coinsEarned),
   A('du1','ともだち','はじめての勝負','挑戦状で勝負する',1,S=>S.duels),
@@ -1016,6 +1035,27 @@ function drawSkin(ctx,id,r,L,t){
   else if(id==='gold'){ const g=ctx.createLinearGradient(-r,0,r,0); g.addColorStop(0,'#A8640E'); g.addColorStop(0.35,'#FFE88A'); g.addColorStop(0.6,'#FFC83A'); g.addColorStop(1,'#8A4A06'); ctx.globalAlpha=0.85; ctx.fillStyle=g; ctx.fillRect(-r,-L,w,L);
     const sy=((t*0.6)%1.6-0.3)*L; const sg=ctx.createLinearGradient(0,-sy-30,0,-sy+30); sg.addColorStop(0,'rgba(255,255,255,0)'); sg.addColorStop(0.5,'rgba(255,255,255,.8)'); sg.addColorStop(1,'rgba(255,255,255,0)'); ctx.globalAlpha=1; ctx.fillStyle=sg; ctx.fillRect(-r,-sy-30,w,60); }
   else if(id==='rainbow'){ const g=ctx.createLinearGradient(0,-L,0,0); for(let i=0;i<=6;i++) g.addColorStop(i/6,`hsla(${(t*90+i*60)%360},95%,62%,.75)`); ctx.fillStyle=g; ctx.fillRect(-r,-L,w,L); }
+  else if(id==='matcha'||id==='caramel'||id==='vanilla'||id==='cocoa'){ const c={matcha:'rgba(110,170,60,.5)',caramel:'rgba(200,120,40,.45)',vanilla:'rgba(255,246,220,.6)',cocoa:'rgba(90,45,20,.45)'}[id]; ctx.fillStyle=c; ctx.fillRect(-r,-L,w,L);
+    if(id==='vanilla'){ ctx.fillStyle='rgba(40,20,10,.55)'; for(let i=0;i<L/7;i++) ctx.fillRect((prand(i)-0.5)*w*0.8,-L+prand(i+40)*L,1.3,1.3); }
+    if(id==='cocoa'){ ctx.fillStyle='rgba(60,30,15,.35)'; for(let i=0;i<L/3;i++) ctx.fillRect((prand(i)-0.5)*w*0.9,-L+prand(i+60)*L,1.8,1.8); } }
+  else if(id==='hearts'){ ctx.fillStyle='#FF4A7A'; for(let i=0,y=-L+w*0.6;y<0;i++,y+=w*0.85){ const x=(i%2?-0.35:0.35)*r, k=r*0.36; ctx.beginPath(); ctx.moveTo(x,y+k*0.9); ctx.bezierCurveTo(x-k*1.4,y-k*0.2,x-k*0.5,y-k*1.2,x,y-k*0.3); ctx.bezierCurveTo(x+k*0.5,y-k*1.2,x+k*1.4,y-k*0.2,x,y+k*0.9); ctx.fill(); } }
+  else if(id==='lemon'){ ctx.fillStyle='rgba(255,236,90,.55)'; ctx.fillRect(-r,-L,w,L); ctx.fillStyle='rgba(255,255,255,.7)'; for(let y=-L;y<0;y+=w*0.8) ctx.fillRect(-r,y,w,w*0.25); }
+  else if(id==='berry'){ ctx.fillStyle='rgba(120,90,200,.3)'; ctx.fillRect(-r,-L,w,L); for(let i=0,y=-L+w*0.5;y<0;i++,y+=w*0.6){ const x=(i%2?-0.4:0.4)*r; ctx.fillStyle='#4A3AA8'; ctx.beginPath(); ctx.arc(x,y,r*0.3,0,Math.PI*2); ctx.fill(); ctx.fillStyle='rgba(255,255,255,.6)'; ctx.fillRect(x-1,y-r*0.15,1.6,1.6); } }
+  else if(id==='cookie'){ ctx.fillStyle='rgba(255,252,240,.75)'; ctx.fillRect(-r,-L,w,L); ctx.fillStyle='#2A1408'; for(let i=0;i<L/5;i++){ ctx.save(); ctx.translate((prand(i)-0.5)*w*0.8,-L+prand(i+17)*L); ctx.rotate(prand(i+2)*3); ctx.fillRect(-2.2,-1.4,4.4,2.8); ctx.restore(); } }
+  else if(id==='ripple'){ ctx.strokeStyle='rgba(80,170,255,.6)'; ctx.lineWidth=Math.max(1.2,w*0.1); for(let y=-L+4;y<0;y+=w*0.6){ ctx.beginPath(); for(let x=-r;x<=r;x+=1){ const yy=y+Math.sin(x/r*Math.PI*2+t*3+y*0.1)*w*0.12; x===-r?ctx.moveTo(x,yy):ctx.lineTo(x,yy); } ctx.stroke(); } }
+  else if(id==='aurora'){ const g=ctx.createLinearGradient(-r,-L,r,0); g.addColorStop(0,`hsla(${160+40*Math.sin(t)},90%,60%,.6)`); g.addColorStop(0.5,`hsla(${260+40*Math.sin(t*1.3)},90%,65%,.55)`); g.addColorStop(1,`hsla(${190+40*Math.sin(t*0.7)},90%,60%,.6)`); ctx.fillStyle=g; ctx.fillRect(-r,-L,w,L); }
+  else if(id==='neon'){ ctx.fillStyle='rgba(20,10,30,.7)'; ctx.fillRect(-r,-L,w,L); const hue=(t*120)%360; ctx.strokeStyle=`hsl(${hue},100%,62%)`; ctx.shadowColor=ctx.strokeStyle; ctx.shadowBlur=8; ctx.lineWidth=Math.max(1.4,w*0.12); for(let y=-L+6;y<0;y+=w*1.1){ ctx.beginPath(); ctx.moveTo(-r*0.7,y); ctx.lineTo(r*0.7,y+w*0.5); ctx.stroke(); } ctx.shadowBlur=0; }
+  else if(id==='marble'){ ctx.fillStyle='rgba(255,250,245,.7)'; ctx.fillRect(-r,-L,w,L); ctx.strokeStyle='rgba(90,45,25,.6)'; ctx.lineWidth=Math.max(1.2,w*0.09); for(let k=0;k<3;k++){ ctx.beginPath(); for(let y=-L;y<=0;y+=3){ const x=Math.sin(y*0.07+k*2.1)*r*0.6+Math.sin(y*0.19+k)*r*0.2; y===-L?ctx.moveTo(x,y):ctx.lineTo(x,y); } ctx.stroke(); } }
+  else if(id==='firework'){ ctx.fillStyle='rgba(20,15,50,.6)'; ctx.fillRect(-r,-L,w,L); for(let i=0;i<L/22;i++){ const cx=(prand(i)-0.5)*w*0.5, cy=-L+prand(i+8)*L, ph=(t*0.8+prand(i+4))%1, R2=r*0.9*ph; ctx.strokeStyle=`hsla(${prand(i+1)*360},100%,65%,${1-ph})`; ctx.lineWidth=1.4; for(let k=0;k<8;k++){ const a=k/8*Math.PI*2; ctx.beginPath(); ctx.moveTo(cx+Math.cos(a)*R2*0.4,cy+Math.sin(a)*R2*0.4); ctx.lineTo(cx+Math.cos(a)*R2,cy+Math.sin(a)*R2); ctx.stroke(); } } }
+  else if(id==='diamond'){ const g=ctx.createLinearGradient(-r,0,r,0); g.addColorStop(0,'rgba(200,230,255,.7)'); g.addColorStop(0.5,'rgba(255,255,255,.85)'); g.addColorStop(1,'rgba(170,210,255,.7)'); ctx.fillStyle=g; ctx.fillRect(-r,-L,w,L);
+    ctx.strokeStyle='rgba(120,170,230,.55)'; ctx.lineWidth=1; for(let y=-L;y<0;y+=w*0.7){ ctx.beginPath(); ctx.moveTo(-r,y); ctx.lineTo(0,y+w*0.35); ctx.lineTo(r,y); ctx.stroke(); }
+    for(let i=0;i<4;i++){ const a=Math.max(0,Math.sin(t*3+i*1.6)); ctx.fillStyle=`rgba(255,255,255,${a})`; star5(ctx,(prand(i)-0.5)*w*0.6,-L+prand(i+3)*L,r*0.4*a+0.5); } }
+  else if(id==='phoenix'){ const g=ctx.createLinearGradient(0,0,0,-L); g.addColorStop(0,'rgba(255,60,20,.75)'); g.addColorStop(0.5,'rgba(255,150,30,.7)'); g.addColorStop(1,'rgba(255,230,90,.65)'); ctx.fillStyle=g; ctx.fillRect(-r,-L,w,L);
+    for(let i=0;i<L/8;i++){ const ph=(t*0.9+prand(i))%1, y=-ph*L, x=(prand(i+5)-0.5)*w*0.7+Math.sin(t*5+i)*2; ctx.fillStyle=`rgba(255,${200+55*ph|0},120,${1-ph})`; ctx.beginPath(); ctx.ellipse(x,y,1.6,3.4,0,0,Math.PI*2); ctx.fill(); } }
+  else if(id==='royal'){ const g=ctx.createLinearGradient(-r,0,r,0); g.addColorStop(0,'#3A0A5A'); g.addColorStop(0.5,'#7A2AA8'); g.addColorStop(1,'#3A0A5A'); ctx.globalAlpha=0.85; ctx.fillStyle=g; ctx.fillRect(-r,-L,w,L); ctx.globalAlpha=1;
+    const gg=ctx.createLinearGradient(-r,0,r,0); gg.addColorStop(0,'#A8640E'); gg.addColorStop(0.5,'#FFE88A'); gg.addColorStop(1,'#A8640E'); ctx.fillStyle=gg;
+    for(let y=-L+w*0.8;y<0;y+=w*1.4){ ctx.beginPath(); ctx.moveTo(-r*0.6,y); ctx.lineTo(-r*0.6,y-w*0.35); ctx.lineTo(-r*0.3,y-w*0.15); ctx.lineTo(0,y-w*0.45); ctx.lineTo(r*0.3,y-w*0.15); ctx.lineTo(r*0.6,y-w*0.35); ctx.lineTo(r*0.6,y); ctx.closePath(); ctx.fill(); }
+    ctx.fillRect(-r,-L,w*0.12,L); ctx.fillRect(r-w*0.12,-L,w*0.12,L); }
   else if(id==='galaxy'){ const g=ctx.createLinearGradient(0,-L,0,0); g.addColorStop(0,'#1A0E4A'); g.addColorStop(0.5,'#4A1A7A'); g.addColorStop(1,'#0E1A4A'); ctx.fillStyle=g; ctx.fillRect(-r,-L,w,L);
     for(let i=0;i<L/6;i++){ const a=0.4+0.6*Math.abs(Math.sin(t*3+i*1.7)); ctx.fillStyle=`rgba(255,255,255,${a})`; ctx.fillRect((prand(i)-0.5)*w*0.8,-L+prand(i+11)*L,1.6,1.6); } }
   ctx.restore();
@@ -1328,9 +1368,10 @@ class Engine{
     const prog=this.prog, pool=[...Array(prog).keys()], k=this.encounters;
     const ev=eventBoss();
     if(!this.eventDone&&k>=1&&Math.random()<0.22) return {def:ev,isEvent:true,hpMul:1+0.05*k};
-    const newAvail=prog<BOSSES.length&&this.newKills<2;
-    const pNew=this.newEscapes>0?0.35:0.6;
-    if(newAvail&&(pool.length===0||this.sinceNew>=2||Math.random()<pNew)) return {def:BOSSES[prog],isNew:true,hpMul:1};
+    const lvNow=levelInfo(this.store.xp||0).lv;
+    const newAvail=prog<BOSSES.length&&this.newKills<1&&lvNow>=BOSS_LV[prog];
+    const pNew=this.newEscapes>0?0.25:0.45;
+    if(newAvail&&(pool.length===0||this.sinceNew>=3||Math.random()<pNew)) return {def:BOSSES[prog],isNew:true,hpMul:1.2};
     if(pool.length){
       let cand=pool.filter(i=>BOSSES[i].type!==this.lastBossType); if(!cand.length) cand=pool;
       const i=cand[Math.random()*cand.length|0];
@@ -1369,7 +1410,7 @@ class Engine{
       this.banner(b.def.name+' 撃破！',sub,true,b.plan.isNew||b.plan.isEvent?'rainbow':null,'boss');
       this.coinBurst(b.plan.isEvent?80:46); this.confetti(b.plan.isEvent?90:40); this.shake=16; this.flash=1; this.flashCol='255,240,190'; haptic([80,50,80,50,160]);
       Snd.shatter(); this.later(0.25,()=>Snd.bossDown());
-      if(b.plan.isNew&&this.prog<BOSSES.length&&this.newKills<2) this.later(2.2,()=>this.toast('次の新ボス「'+BOSSES[this.prog].name+'」が近づいている…','#FFD166'));
+      if(b.plan.isNew&&this.prog<BOSSES.length){ const nl=BOSS_LV[this.prog], lvN=levelInfo(this.store.xp||0).lv; this.later(2.2,()=>this.toast(lvN>=nl?'次の新ボスは、次のゲームから登場！':'次の新ボスはレベル'+nl+'から登場','#FFD166')); }
       this.later(1.5,()=>this.startRoulette(b.plan.isEvent?'イベントボス撃破ボーナス':'ボス撃破ボーナス'));
       if(this.gauge>=1) this.later(1.2,()=>this.startFever());
     } else {
@@ -1422,7 +1463,7 @@ class Engine{
   evaluate(){
     const s=this.stick, G=this.g;
     if(!this.running){ s.coat=0; s.phase='ready'; return; }
-    const c=s.coat, tg=s.target, d=Math.abs(c-tg);
+    const c=s.coat, tg=s.target, d=Math.abs(c-tg); this.mLast={coat:c,target:tg,t:0};
     const pw=this.ab('shrink')?0.018:0.03, gw=this.ab('shrink')?0.055:0.08;
     let res,label;
     if(c>=0.985){ res='miss'; label='持ち手がない！'; }
@@ -1512,7 +1553,7 @@ class Engine{
     const isBest=this.score>prev.best;
     const bossProg=Math.max(prev.bossProg||0,this.prog);
     const newBosses=BOSSES.slice(prev.bossProg||0,bossProg); const newBoss=newBosses.length?newBosses[newBosses.length-1]:null;
-    const coins=Math.floor(this.score/100)+r.bossKills*15+r.eventKills*(eventBoss().coins)+newAch.length*10+(daily1?50:0);
+    const coins=Math.floor(this.score/200)+r.bossKills*10+r.eventKills*(eventBoss().coins)+newAch.length*10+(daily1?50:0);
     stats.coinsEarned=(stats.coinsEarned||0)+coins;
     const nextBoss=BOSSES[bossProg]||null;
     const next={...prev,best:Math.max(prev.best,this.score),ach:[...achAll],xp:xpAfter,lastDay:today,streak,stats,rank:top,bossProg,coins:(prev.coins||0)+coins,bossLog,mis};
@@ -1601,6 +1642,7 @@ class Engine{
       this.particles.push({blob:true,x:this.strand.x,y:(tip+this.surf)/2,vx:0,vy:60,life:2,r:2.8,col:this.fl.coat,grav:900}); this.ripples.push({x:this.strand.x,t:0,small:true}); this.strand=null; } }
     // スティックまわりの盛り上がり（とろみ）
     { const s2=this.stick; let tgt=0; if(s2&&s2.sub>0) tgt=s2.phase==='down'?-3:(s2.phase==='up'?7:2); if(this.strand) tgt=5; this.men=(this.men||0)+(tgt-(this.men||0))*Math.min(1,dt*7); }
+    if(this.mLast){ this.mLast.t+=dt; if(this.mLast.t>1.4) this.mLast=null; }
     this.shake=Math.max(0,this.shake-dt*28); this.flash=Math.max(0,this.flash-dt*2.2);
   }
 
@@ -1835,12 +1877,30 @@ class Engine{
       ctx.fillStyle='rgba(255,200,60,.28)'; ctx.fillRect(gx,Y(Math.min(1,s.target+0.08)),gw,gh*0.16);
       ctx.shadowColor='rgba(255,210,80,.9)'; ctx.shadowBlur=8; ctx.fillStyle='#FFD23C'; ctx.fillRect(gx,Y(s.target+0.03),gw,gh*0.06); ctx.shadowBlur=0;
       ctx.globalAlpha=1;
-      const cur=Math.max(0,Math.min(1,s.sub||0));
+      // 答え合わせメーター：ひたしている間は中が見えない。はなしたら止めた位置を表示
+      const live=!!this.tut, M=this.mLast, reveal=s.phase==='up'?Math.min(1,(s.upT=(s.upT||0)+1/60)/0.25):0;
       const cg=ctx.createLinearGradient(gx,0,gx+gw,0); cg.addColorStop(0,tone(fl.pool[1],0.6)); cg.addColorStop(0.35,tone(fl.pool[1],1.25)); cg.addColorStop(1,tone(fl.pool[1],0.7));
-      ctx.fillStyle=cg; ctx.fillRect(gx+3,Y(cur),gw-6,cur*gh);
+      let show=null;
+      if(live) show=Math.max(0,Math.min(1,s.sub||0));
+      else if(s.phase==='up') show=s.coat*ease(reveal);
+      else if(M&&(s.phase==='enter'||s.phase==='ready')) show=M.coat;
+      if(show!=null){ ctx.fillStyle=cg; ctx.fillRect(gx+3,Y(show),gw-6,show*gh); }
+      if(show!=null&&!live){ const tv=(M&&s.phase!=='up')?M.target:s.target; ctx.fillStyle='#FFD23C'; ctx.fillRect(gx,Y(tv+0.03),gw,gh*0.06*0.5+1); }
+      if(!live&&(s.phase==='down'||(s.phase==='ready'&&!M)||(s.phase==='enter'&&!M))){
+        // くもりガラス
+        ctx.fillStyle='rgba(235,220,200,.2)'; ctx.fillRect(gx,gy,gw,gh);
+        for(let i=0;i<7;i++){ const yy=gy+gh-((this.t*0.35+i/7)%1)*gh; ctx.fillStyle='rgba(255,255,255,.35)'; ctx.beginPath(); ctx.arc(gx+gw*(0.3+0.4*prand(i)),yy,1.6+prand(i+3)*1.6,0,Math.PI*2); ctx.fill(); }
+      }
       ctx.restore();
       ctx.fillStyle='rgba(255,255,255,.35)'; rr(ctx,gx+3,gy+6,3,gh-12,2); ctx.fill();
-      if(s.coat>0){ ctx.fillStyle='#fff'; ctx.fillRect(gx-4,Y(s.coat)-1.5,gw+8,3); }
+      if(live&&s.coat>0){ ctx.fillStyle='#fff'; ctx.fillRect(gx-4,Y(s.coat)-1.5,gw+8,3); }
+      if(!live&&show!=null&&show>0){ ctx.fillStyle='#fff'; ctx.fillRect(gx-4,Y(show)-1.5,gw+8,3); }
+      // ずれの表示
+      if(!live&&M&&(s.phase==='enter'||s.phase==='ready')){ const dv=Math.round((M.coat-M.target)*100), a=Math.max(0,Math.min(1,(1.4-M.t)/0.4));
+        ctx.save(); ctx.globalAlpha=a; ctx.font=`900 13px ${FONT_UI}`; ctx.textAlign='left'; ctx.textBaseline='middle';
+        const txt=dv===0?'ぴったり':(dv>0?'+'+dv+'%':dv+'%'), col=Math.abs(dv)<=4?'#FFD23C':(Math.abs(dv)<=9?'#FFF3DE':'#FFB4A0');
+        ctx.lineWidth=3.5; ctx.strokeStyle='rgba(30,10,4,.9)'; ctx.strokeText(txt,gx+gw+9,Y(M.coat)); ctx.fillStyle=col; ctx.fillText(txt,gx+gw+9,Y(M.coat)); ctx.restore(); }
+      if(s.phase!=='up') s.upT=0;
       ctx.lineWidth=2; ctx.strokeStyle='rgba(255,240,220,.55)'; rr(ctx,gx,gy,gw,gh,9); ctx.stroke();
       ctx.fillStyle='#FFE9B0'; ctx.font=`900 10px ${FONT_UI}`; ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.fillText('つけ具合',gx+gw/2,gy-16); ctx.fillText('目標',gx+gw/2,gy+gh+12);
@@ -2050,13 +2110,13 @@ function AchBody({store,bossOnly}){
           h('span',{className:'ap'+(ok?' ok':'')},ok?'達成':`${fmt(v)}/${fmt(a.goal)}`));
       })))),
     h('p',{className:'cat'},`ボス図鑑 ${S.bossTypes.length} / ${BOSSES.length}`),
-    h('p',{className:'note'},'ボスは次々に登場し、たおしたボスは全員また出てきます。新ボスをたおすと、そのゲームの中で次の新ボスが現れます。同じボスをたくさんたおすと★ランクが上がります。'),
+    h('p',{className:'note'},'たおしたボスは全員また出てきます。新しいボスに出会えるのは1回のゲームで1体まで。レベルが上がるほど強いボスが現れます。同じボスをたくさんたおすと★ランクが上がります。'),
     h('div',{className:'bossgrid'},BOSSES.map((b,i)=>{ const ok=S.bossTypes.includes(b.type), next=i===(store.bossProg||0), lg=(store.bossLog||{})[b.type]||{}, rk=bossRank(lg.k||0);
       return h('button',{key:b.type,className:'bosscard'+(ok?'':' lock')+(next?' next':''),onClick:()=>(ok||next)&&setSel({b})},
         ok&&lg.k>0&&h('i',{className:'bkill r'+rk.n},'×'+lg.k),
         h('img',{src:IMG_SRC['boss_'+b.type],alt:''}),
         h('b',null,ok?`${i+1}. ${b.name}`:(next?`${i+1}. 次の新ボス`:`${i+1}. ？？？`)),
-        h('span',null,ok?b.desc:(next?'能力：'+b.ab.map(a=>AB_NAME[a]).join('・'):'まだ出会っていない')),
+        h('span',null,ok?b.desc:(next?(levelInfo(store.xp||0).lv>=BOSS_LV[i]?'能力：'+b.ab.map(a=>AB_NAME[a]).join('・'):`レベル${BOSS_LV[i]}から登場`):`レベル${BOSS_LV[i]}から登場`)),
         ok&&h('em',null,'能力：'+b.ab.map(a=>AB_NAME[a]).join('・'))); })),
     h('p',{className:'cat'},'イベントボス（週替わり）'),
     h('div',{className:'bossgrid'},EVENT_BOSSES.map(b=>{ const ok=(S.eventTypes||[]).includes(b.type), now=eventBoss().type===b.type;
@@ -2204,10 +2264,10 @@ function SettingsBody({store,setStore,sound,setSound,onClose,onTutorial}){
     h('button',{className:'cbtn sm green',onClick:onTutorial},h('span',{className:'main'},'練習モードで遊ぶ'),h('small',null,'3本だけ、ヒントつきで練習できます')),
     h('div',{className:'howto'},
       h('div',null,h('b',null,'1'),h('span',null,'画面を長押しするとスティックがチョコに沈みます。指をはなすと引き上げます。')),
-      h('div',null,h('b',null,'2'),h('span',null,'金色の矢印の高さでぴったり止めるとパーフェクト。左のメーターでも確認できます。')),
+      h('div',null,h('b',null,'2'),h('span',null,'金色の矢印の高さでぴったり止めるとパーフェクト。チョコを見て止めよう。左のメーターは、はなしたあとに「どこで止めたか」を答え合わせします。')),
       h('div',null,h('b',null,'3'),h('span',null,'パーフェクトでゲージがたまり、満タンでフィーバー（得点2倍）。金色のトリュフがそろうと超フィーバー（3倍）。')),
       h('div',null,h('b',null,'4'),h('span',null,'箱の完成・10コンボ・金のパーフェクトでトリュフくじが引けます。3つそろうとフィーバー。トリュフが金や虹色だと当たりやすい。')),
-      h('div',null,h('b',null,'5'),h('span',null,'ボスは次々に登場。たおしたボスは全員また出てきます。新ボスは出やすく、たおせば同じゲームの中で次の新ボスへ。')),
+      h('div',null,h('b',null,'5'),h('span',null,'ボスは次々に登場。たおしたボスは全員また出てきます。新しいボスは1ゲーム1体まで、レベルが上がると現れます。')),
       h('div',null,h('b',null,'6'),h('span',null,'ボスをたおすとボーナスルーレット（1回のゲームで2回まで）。週替わりのイベントボスはコインがたくさん。コインで着せ替えガチャ（80回で天井）。'))),
     h('p',{className:'cat'},'データのリセット'),
     doneMsg?h('div',{className:'rankin'},doneMsg):null,
@@ -2401,7 +2461,7 @@ function Result({r,store,onRetry,onHome,openSheet}){
           return h('div',{key:m.id,className:'mr'+(v>=m.goal?' ok':'')+(nw?' new':'')},h('span',null,m.text),h('div',{className:'pbar'},h('i',{style:{width:(v/m.goal*100)+'%'}}))); }),
         misClaimable(loadStore())>0&&h('small',null,'タップしてコインを受け取る')),
       r.newBosses&&r.newBosses.length>0&&h('div',{className:'rankin'},`新ボス ${r.newBosses.map(b=>'「'+b.name+'」').join('')} を図鑑に登録！`),
-      r.nextBoss&&h('div',{className:'nextboss'},h('img',{src:IMG_SRC['boss_'+r.nextBoss.type],alt:''}),h('div',null,h('b',null,'次の新ボス'),h('span',null,`能力：${r.nextBoss.ab.map(a=>AB_NAME[a]).join('・')}`),h('small',null,'ゲームの最後に登場。強いうちに会いに行こう'))),
+      r.nextBoss&&h('div',{className:'nextboss'},h('img',{src:IMG_SRC['boss_'+r.nextBoss.type],alt:''}),h('div',null,h('b',null,'次の新ボス'),h('span',null,`能力：${r.nextBoss.ab.map(a=>AB_NAME[a]).join('・')}`),h('small',null,(()=>{ const nl=BOSS_LV[BOSSES.findIndex(b=>b.type===r.nextBoss.type)]||1, lv=levelInfo(loadStore().xp||0).lv; return lv>=nl?'次のゲームで出会えるかも':`レベル${nl}から登場（いまレベル${lv}）`; })()))),
       h('div',{className:'nexts'},
         !r.isBest&&r.prevBest>0&&h('span',null,'自己ベストまで あと ',h('b',null,fmt(r.prevBest-r.score+1)),' 点'),
         nextF&&h('span',null,`「${nextF.name}」味まで あと `,h('b',null,fmt(needXp)),' 経験値'),
