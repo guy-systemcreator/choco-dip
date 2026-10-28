@@ -30,7 +30,7 @@ img{max-width:100%}[hidden]{display:none!important}
   --f-ui:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;
   color-scheme:dark;
 }
-html,body{height:100%}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
 body{background:#0E1A10;color:#fff;font-family:var(--f-ui);font-weight:800;overflow:hidden;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
 *{box-sizing:border-box}
 #root{height:100%}
@@ -39,7 +39,7 @@ button{cursor:pointer;border:0;background:none;color:inherit;padding:0}
 button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
-.game{position:fixed;left:0;right:0;top:0;height:var(--appH,100%);overflow:hidden;max-width:560px;margin:0 auto;background:#0E1A10}
+.game{position:fixed;left:0;right:0;top:0;height:100vh;height:var(--appH,100svh);overflow:hidden;max-width:560px;margin:0 auto;background:#0E1A10}
 .stage{position:absolute;inset:0;touch-action:none}
 .stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 
@@ -297,16 +297,130 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-o
 .gcard.rSR{background:linear-gradient(180deg,#F4E8FF,#fff)}
 .gcard.rSSR{background:linear-gradient(180deg,#FFF4C2,#fff);box-shadow:0 3px 0 #E0A82A,0 0 0 2px #FFC83A,0 0 18px rgba(255,200,60,.6)}
 .pity{display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:900;color:#7A4A2A;text-align:center}
+html[data-h~=h720] .home .logo, html[data-h~=h720] .logo{width:min(64%,300px);margin-top:6px} html[data-h~=h720] .tagline{font-size:12px} html[data-h~=h720] .actions{gap:10px} html[data-h~=h720] .evcard img{height:56px}
 @media (max-height:720px){ .logo{width:min(64%,300px);margin-top:6px} .tagline{font-size:12px} .actions{gap:10px} .evcard img{height:56px} }
 
 /* どの機種でも下が見切れないように：ロゴが縮んで残りを全部おさめる */
 .home>*{flex:none}
 .home .logo{flex:0 1 auto;min-height:70px;object-fit:contain;width:min(86%,400px)}
 .home .homespace{flex:1 1 0;min-height:4px}
+html[data-h~=h800] .home .logo{margin-top:8px} html[data-h~=h800] .actions{gap:10px;padding-bottom:10px} html[data-h~=h800] .actions .cbtn{padding-top:10px;padding-bottom:12px} html[data-h~=h800] .evcard img{height:54px}
 @media (max-height:800px){ .home .logo{margin-top:8px} .actions{gap:10px;padding-bottom:10px} .actions .cbtn{padding-top:10px;padding-bottom:12px} .evcard img{height:54px} }
+html[data-h~=h700] .actions .cbtn.sm small{display:none} html[data-h~=h700] .tagline{font-size:12px} html[data-h~=h700] .tab img{width:32px;height:32px}
 @media (max-height:700px){ .actions .cbtn.sm small{display:none} .tagline{font-size:12px} .tab img{width:32px;height:32px} }
 @media (max-height:620px){ .evcard{display:none} }
+html[data-h~=h620] .evcard{display:none}
 @media (max-width:390px){ .actions .cbtn.sm .main{font-size:16px;white-space:nowrap} }
+.rotate{display:none}
+@media (orientation:landscape) and (max-height:500px){
+  .rotate{display:flex;position:fixed;inset:0;z-index:99;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#1A0A04;color:#FFE9B0;font-size:18px;font-weight:900;text-align:center}
+  .rotate i{font-style:normal;font-size:44px;display:block;animation:rot 1.6s ease-in-out infinite}
+}
+@keyframes rot{0%,30%{transform:rotate(90deg)}60%,100%{transform:rotate(0deg)}}
+@media (max-width:350px){ .tab{font-size:10px;white-space:nowrap;letter-spacing:-.03em} .lvchip *{white-space:nowrap} }
+
+.resetbox{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.resetbox .cbtn small{font-size:10.5px}
+.resetask{background:#FFF1E0;border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;color:var(--ink)}
+.resetask p{margin:0;font-size:13.5px;line-height:1.5}
+/* ===== 共通：灰色ボタン ===== */
+.cbtn.gray{--b1:#E4D8C8;--b2:#B8A898;--b3:#8E7E70;--b4:#5A4C40}
+.cbtn:disabled{filter:saturate(.6);opacity:.85}
+/* ===== ボス図鑑の詳細 ===== */
+button.bosscard{border:0;font:inherit;position:relative;cursor:pointer;width:100%}
+button.bosscard:active{transform:scale(.97)}
+.bkill{position:absolute;right:8px;top:8px;font-style:normal;font-size:11px;font-weight:900;padding:2px 7px;border-radius:99px;background:#7A4A2A;color:#fff}
+.bkill.r1{background:#B07040}.bkill.r2{background:#9AA8B8}.bkill.r3{background:#E0A812}.bkill.r4{background:linear-gradient(90deg,#FF5A8E,#FFB21E,#5CCB2E,#3AB0FF,#B05AFF)}
+.bdbg{position:fixed;inset:0;z-index:40;background:rgba(10,4,2,.6);display:flex;align-items:center;justify-content:center;padding:16px;animation:fade .2s}
+.bdcard{position:relative;width:100%;max-width:420px;max-height:86%;overflow-y:auto;background:var(--cream);color:var(--ink);border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 8px 0 var(--paper-line),0 20px 50px rgba(0,0,0,.5);animation:up .25s cubic-bezier(.2,.9,.25,1.1)}
+.bdx{position:absolute;right:10px;top:10px;width:34px;height:34px;border-radius:50%;border:0;background:var(--red);color:#fff;font-size:20px;font-weight:900;box-shadow:0 3px 0 var(--red-deep)}
+.bdtop{display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:center;background:linear-gradient(180deg,#5A2A14,#2A1006);border-radius:18px;padding:10px;color:#fff}
+.bdtop img{width:106px;height:126px;object-fit:contain;filter:drop-shadow(0 6px 6px rgba(0,0,0,.5))}
+.bdtop img.sil{filter:brightness(0) drop-shadow(0 0 6px #FFB21E)}
+.bdtop small{font-size:11px;color:#FFE9B0;font-weight:900}
+.bdtop b{display:block;font-size:19px;line-height:1.3;margin:2px 0 6px}
+.bdrank{font-size:16px;letter-spacing:1px;color:#FFD23C}
+.bdrank span{display:inline-block;margin-left:6px;font-size:11px;letter-spacing:0;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,.16);color:#fff;vertical-align:2px}
+.bdrank.r0{color:rgba(255,255,255,.35)}
+.bdprof{margin:0;font-size:13.5px;line-height:1.6;font-weight:700;padding:10px 12px;border-radius:14px;background:#FFF8EC;border:2px dashed #E8D4B4}
+.bdstats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.bdstats div{background:#fff;border-radius:12px;padding:7px 4px;text-align:center;box-shadow:0 2px 0 var(--paper-line)}
+.bdstats small{display:block;font-size:10.5px;color:#8A5A3A;font-weight:900}
+.bdstats b{display:block;font-size:16px;color:var(--choco-2)}
+.bdtips{display:flex;flex-direction:column;gap:6px}
+.bdtips div{background:#fff;border-radius:12px;padding:8px 10px;box-shadow:0 2px 0 var(--paper-line)}
+.bdtips b{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:#5A2A14;color:#FFD23C;margin-bottom:3px}
+.bdtips span{display:block;font-size:12.5px;font-weight:700;line-height:1.5}
+/* ===== 毎日ミッション ===== */
+.misbar{position:relative;display:flex;align-items:center;gap:8px;width:100%;border:0;font:inherit;padding:8px 14px;border-radius:16px;color:#fff;background:linear-gradient(180deg,rgba(58,26,12,.85),rgba(30,12,6,.9));box-shadow:inset 0 0 0 1.5px rgba(255,210,120,.45),0 3px 0 rgba(0,0,0,.35)}
+.misbar.ready{box-shadow:inset 0 0 0 2px #FFD23C,0 0 14px rgba(255,210,60,.55),0 3px 0 rgba(0,0,0,.35);animation:glowp 1.4s ease-in-out infinite}
+@keyframes glowp{50%{box-shadow:inset 0 0 0 2px #FFF16B,0 0 22px rgba(255,210,60,.8),0 3px 0 rgba(0,0,0,.35)}}
+.misbar .mt{font-size:14px;font-weight:900}
+.misbar .dots{display:flex;gap:5px;flex:1}
+.misbar .dots i{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.22);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35)}
+.misbar .dots i.ok{background:#FFD23C;box-shadow:0 0 8px #FFD23C}
+.misbar .dots i.got{background:#5CCB2E}
+.misbar .ms{font-size:13px;font-weight:900;color:#FFE9B0}
+.misbar .badge-new{top:-8px;right:-6px}
+.mislist{display:flex;flex-direction:column;gap:8px}
+.misrow{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;background:#fff;border-radius:16px;padding:10px;box-shadow:0 3px 0 var(--paper-line)}
+.misrow.ok{box-shadow:0 3px 0 var(--paper-line),0 0 0 2.5px #FFB21E}
+.misrow.got{opacity:.7}
+.mtier{writing-mode:vertical-rl;font-size:11px;font-weight:900;padding:6px 3px;border-radius:8px;color:#fff;letter-spacing:1px}
+.mtier.t0{background:#5CCB2E}.mtier.t1{background:#2F9BFF}.mtier.t2{background:#F0404A}
+.mmain{min-width:0;display:flex;flex-direction:column;gap:4px}
+.mmain b{font-size:14px;line-height:1.35}
+.mmain small{font-size:11px;color:#8A5A3A;font-weight:800}
+.misrow .cbtn{min-width:86px;padding:8px 6px 10px}
+.misrow .cbtn .main{font-size:14px}
+.misrow .cbtn small{font-size:10px}
+.mgot{font-size:11px;font-weight:900;color:#2E9A1C;text-align:center;width:86px}
+.misall{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border-radius:16px;background:linear-gradient(180deg,#5A2A14,#2A1006);color:#fff}
+.misall.ready{box-shadow:0 0 0 2.5px #FFD23C,0 0 16px rgba(255,210,60,.6)}
+.misall b{display:block;font-size:14px;color:#FFD23C}
+.misall small{font-size:11.5px;font-weight:800}
+.misres{display:flex;flex-direction:column;gap:5px;border:0;font:inherit;text-align:left;padding:10px 12px;border-radius:16px;background:#fff;color:var(--ink);box-shadow:0 3px 0 var(--paper-line)}
+.misres>b{font-size:14px;display:flex;justify-content:space-between;align-items:center}
+.misres>b em{font-style:normal;font-size:12px;color:#fff;background:#F0404A;padding:2px 9px;border-radius:99px}
+.misres .mr{display:grid;grid-template-columns:1fr 80px;gap:8px;align-items:center;font-size:12px;font-weight:800}
+.misres .mr.ok span{color:#2E9A1C}
+.misres .mr.new span::before{content:'達成！ ';color:#F0404A}
+.misres>small{font-size:11.5px;font-weight:900;color:#D8820E;text-align:center}
+/* ===== 挑戦状 ===== */
+.duelcard{position:relative;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 12px;border-radius:18px;color:#fff;background:linear-gradient(135deg,#7A1420,#3A0A10);box-shadow:inset 0 0 0 2px #FF8A7A,0 0 16px rgba(255,90,90,.45)}
+.duelcard .dl small{display:block;font-size:11px;font-weight:900;color:#FFD2C8}
+.duelcard .dl b{display:block;font-size:17px;font-weight:900}
+.duelcard .dl span{display:block;font-size:11.5px;font-weight:800;opacity:.92}
+.duelcard .cbtn{padding:9px 12px 11px}
+.duelcard .cbtn .main{font-size:15px}
+.dclose{position:absolute;right:-6px;top:-8px;width:26px;height:26px;border-radius:50%;border:0;background:#3A1A0C;color:#fff;font-size:15px;font-weight:900;box-shadow:0 0 0 2px #FF8A7A}
+.duelres{text-align:center;padding:12px;border-radius:18px;background:linear-gradient(180deg,#5A2A14,#2A1006);color:#fff;display:flex;flex-direction:column;gap:6px}
+.duelres.win{background:linear-gradient(180deg,#E0A812,#A8640E);box-shadow:0 0 18px rgba(255,210,60,.6)}
+.duelres.lose{background:linear-gradient(180deg,#5A4C60,#2A2030)}
+.duelres .dh{font-size:30px;font-weight:900;text-shadow:0 3px 0 rgba(0,0,0,.35)}
+.duelres .dv{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
+.duelres .dv small{display:block;font-size:11px;font-weight:900;opacity:.9}
+.duelres .dv b{font-size:20px}
+.duelres .dv span{font-size:14px;font-weight:900;color:#FFE9B0}
+.duelres>small{font-size:12px;font-weight:800}
+/* ===== 練習モード ===== */
+.timer.tutt b{font-size:15px}
+.tutcard{position:absolute;left:14px;right:14px;top:calc(env(safe-area-inset-top,0px) + 118px);z-index:6;pointer-events:none;background:rgba(30,12,6,.86);border-radius:18px;padding:10px 14px;box-shadow:inset 0 0 0 1.5px rgba(255,210,120,.5);text-align:center;color:#fff;animation:fade .3s}
+.tutcard .tsteps{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:4px}
+.tutcard .tsteps i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.25)}
+.tutcard .tsteps i.ok{background:#5CCB2E}
+.tutcard .tsteps i.cur{background:#FFD23C;box-shadow:0 0 8px #FFD23C}
+.tutcard .tsteps span{font-size:11.5px;font-weight:900;color:#FFE9B0;margin-left:4px}
+.tutcard b{display:block;font-size:16px;line-height:1.45}
+.tutcard b.tfb{color:#FFD23C}
+.tutnow{position:absolute;left:0;right:0;top:44%;z-index:6;pointer-events:none;text-align:center}
+.tutnow b{font-size:64px;color:#FFE14A;animation:nowp .35s ease-in-out infinite alternate;display:inline-block}
+@keyframes nowp{from{transform:scale(1)}to{transform:scale(1.15)}}
+.tutskip{position:absolute;right:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);z-index:7;border:0;font:inherit;font-size:12.5px;font-weight:900;color:#FFE9B0;background:rgba(30,12,6,.7);padding:8px 14px;border-radius:99px;pointer-events:auto}
+.tutend .howto span{font-size:13px}
+html[data-h~=h700] .misbar{padding:6px 12px}
+.bdrank i{font-style:normal;color:rgba(255,255,255,.22)}
+.coinline{flex-wrap:wrap}.coinline span{font-size:12.5px}
 
 </style>
 </head>
@@ -321,14 +435,14 @@ const RANK_CONFIG = { projectId: 'choco-dip', apiKey: 'AIzaSyB5xlkukkkgZK99MyDX_
 
 /* ================= 保存 ================= */
 const STAT_SUM=['sticks','perfect','good','miss','boxes','fevers','jackpots','bossKills','thinPerfect','goldPerfect','reachMiss','games','noMissGames','dailyGames',
-  'superFevers','slotSpins','superReach','roulettes','rouletteBig','quickKills','feverKills','homeSpins','holdChanges','eventKills','gachaPulls','coinsEarned','ssrGet'];
-const STAT_MAX=['maxCombo','perfectChainMax','bestScore','maxFeverRun','maxBossRun','streakMax','skinCount'];
+  'superFevers','slotSpins','superReach','roulettes','rouletteBig','quickKills','feverKills','homeSpins','holdChanges','eventKills','gachaPulls','coinsEarned','ssrGet','duels','duelWins','misDone'];
+const STAT_MAX=['maxCombo','perfectChainMax','bestScore','maxFeverRun','maxBossRun','streakMax','skinCount','bossKillMax'];
 const STAT_SET=['bossTypes','flavorsPlayed','eventTypes'];
 function emptyStats(){ const s={}; STAT_SUM.forEach(k=>s[k]=0); STAT_MAX.forEach(k=>s[k]=0); STAT_SET.forEach(k=>s[k]=[]); return s; }
 function mergeStats(a,b){ const s={}; STAT_SUM.forEach(k=>s[k]=(a[k]||0)+(b[k]||0)); STAT_MAX.forEach(k=>s[k]=Math.max(a[k]||0,b[k]||0));
   STAT_SET.forEach(k=>s[k]=[...new Set([...(a[k]||[]),...(b[k]||[])])]); return s; }
 function rid(){ return Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4); }
-function defStore(){ return { pid:rid(), name:'', flavor:'milk', xp:0, best:0, lastDay:'', streak:0, ach:[], stats:emptyStats(), rank:[], bests:{}, bossProg:0, spinDay:'', coins:300, skins:{plain:1}, skin:'plain', pity:0, gift:true }; }
+function defStore(){ return { pid:rid(), name:'', flavor:'milk', xp:0, best:0, lastDay:'', streak:0, ach:[], stats:emptyStats(), rank:[], bests:{}, bossProg:0, spinDay:'', coins:300, skins:{plain:1}, skin:'plain', pity:0, gift:true, tutDone:false, mis:null, bossLog:{}, duel:null, duelRec:{w:0,l:0,d:0} }; }
 let memStore=null;
 function loadStore(){
   if(!memStore){
@@ -375,6 +489,81 @@ const BOSSES = [
   { type:'king',  name:'カカオ大王',       hp:22, bonus:5000, ab:['wave','fast','move','flick','shrink','heal','counter'], desc:'すべての技を使う最後のボス', dur:16 },
 ];
 const AB_NAME={wave:'大波',fast:'高速',fog:'目じるし消し',move:'目じるしゆらし',shield:'鉄壁',heal:'回復',blink:'暗闇',drain:'時間うばい',shrink:'せまい判定',flick:'チラつき',counter:'大反撃'};
+/* ---------- ボス図鑑：プロフィールと攻略のコツ ---------- */
+const AB_TIP={
+  wave:'泉が上下する。泉が高いときは、いつもより少し早めにはなそう',
+  fast:'沈むのが速い。矢印の少し手前で指をはなすとちょうどいい',
+  fog:'ひたすと矢印が消える。押す前に矢印の高さを覚えておこう',
+  move:'矢印がゆれる。はなした瞬間の位置で判定。ゆれの真ん中をねらおう',
+  shield:'グッドではダメージなし。パーフェクトか、金・極細スティックで攻めよう',
+  heal:'少しずつ回復する。フィーバー中に一気にたたみかけよう',
+  blink:'明かりが消えると左のメーターが見えない。スティックの矢印だけを見て合わせよう',
+  drain:'時間が速く減る。長引かせずに早めにたおそう',
+  shrink:'パーフェクトの幅がせまい。グッドでも当てて少しずつ削ろう',
+  flick:'矢印がチラつく。見えた瞬間に高さを覚えよう',
+  counter:'ミスすると大きく回復し、時間も1.5秒へる。あせらず確実に当てよう'
+};
+const BOSS_PROF={
+  wave:'泉で波乗りするのが大好き。悪気はないが、まわりはいつもびしょぬれ。',
+  fast:'なんでも一番乗りでないと気がすまない。昼ごはんは3秒で食べる。',
+  fog:'恥ずかしがり屋で、すぐ霧にかくれる。本当は友だちがほしい。',
+  clown:'工房の人気者。ふざけすぎて親方によくしかられる。',
+  iron:'千年もののカカオの殻でできた鎧が自慢。夏はとても暑い。',
+  sleepy:'一日22時間ねむる。起きている2時間はだいたい機嫌が悪い。',
+  dark:'夜の工房を見回る伯爵。明るい場所がちょっと苦手。',
+  rush:'行列に並べない番長。せっかちすぎて、たまに日付をまちがえる。',
+  needle:'針の穴にチョコを通す名人。几帳面で、少しのズレも許さない。',
+  ice:'北の工房からやってきた姫。冷やしたチョコの固さには一家言ある。',
+  demon:'カカオ大王の右腕。ミスを見のがさず、すかさず反撃してくる。',
+  king:'すべてのカカオを統べる大王。その技を見た職人は数えるほどしかいない。',
+  pumpkin:'秋だけ現れるいたずら魔女。お菓子をくれないと目じるしを消す。',
+  santa:'冬にやってくる大将。配り終えたプレゼントの力で元気になる。',
+  valentine:'2月に現れる恋の使者。矢が速すぎて、だれにも当たらない。',
+  sakura:'春に舞いおりる姫。花吹雪の中で見る矢印は、なかなか読めない。'
+};
+function bossRank(k){ return k>=100?{n:4,lab:'マスター'}:k>=30?{n:3,lab:'ゴールド'}:k>=10?{n:2,lab:'シルバー'}:k>=1?{n:1,lab:'ブロンズ'}:{n:0,lab:'未撃破'}; }
+function fmtSec(x){ return x==null?'—':(Math.round(x*10)/10).toFixed(1)+'秒'; }
+
+/* ---------- 毎日ミッション ---------- */
+const MIS_POOL=[
+  {id:'e_perf',  tier:0, text:'パーフェクトを15回出す',       key:'perfect',    mode:'sum', goal:15},
+  {id:'e_stick', tier:0, text:'スティックを40本しあげる',     key:'sticks',     mode:'sum', goal:40},
+  {id:'e_box',   tier:0, text:'箱を2つ完成させる',            key:'boxes',      mode:'sum', goal:2},
+  {id:'e_play',  tier:0, text:'3回遊ぶ',                      key:'games',      mode:'sum', goal:3},
+  {id:'e_fever', tier:0, text:'フィーバーを1回起こす',         key:'fevers',     mode:'sum', goal:1},
+  {id:'e_c10',   tier:0, text:'1回のゲームで10コンボ',         key:'maxCombo',   mode:'max', goal:10},
+  {id:'e_boss',  tier:0, text:'ボスを1体たおす',              key:'bossKills',  mode:'sum', goal:1},
+  {id:'m_perf',  tier:1, text:'パーフェクトを40回出す',       key:'perfect',    mode:'sum', goal:40},
+  {id:'m_boss',  tier:1, text:'ボスを4体たおす',              key:'bossKills',  mode:'sum', goal:4},
+  {id:'m_gold',  tier:1, text:'金のスティックで3回パーフェクト', key:'goldPerfect',mode:'sum', goal:3},
+  {id:'m_thin',  tier:1, text:'極細スティックで6回パーフェクト', key:'thinPerfect',mode:'sum', goal:6},
+  {id:'m_c20',   tier:1, text:'1回のゲームで20コンボ',         key:'maxCombo',   mode:'max', goal:20},
+  {id:'m_sc',    tier:1, text:'1回のゲームで15,000点',         key:'score',      mode:'max', goal:15000},
+  {id:'m_box',   tier:1, text:'箱を6つ完成させる',            key:'boxes',      mode:'sum', goal:6},
+  {id:'m_jack',  tier:1, text:'トリュフくじを当てる',          key:'jackpots',   mode:'sum', goal:1},
+  {id:'h_boss',  tier:2, text:'ボスを10体たおす',             key:'bossKills',  mode:'sum', goal:10},
+  {id:'h_c35',   tier:2, text:'1回のゲームで35コンボ',         key:'maxCombo',   mode:'max', goal:35},
+  {id:'h_sc',    tier:2, text:'1回のゲームで40,000点',         key:'score',      mode:'max', goal:40000},
+  {id:'h_nomiss',tier:2, text:'20本以上ノーミスで終える',      key:'noMiss',     mode:'max', goal:1},
+  {id:'h_chain', tier:2, text:'パーフェクトを12回連続で出す',   key:'perfectChainMax', mode:'max', goal:12},
+  {id:'h_fk',    tier:2, text:'フィーバー中にボスを2体たおす',  key:'feverKills', mode:'sum', goal:2},
+  {id:'h_super', tier:2, text:'超フィーバーを起こす',          key:'superFevers',mode:'sum', goal:1},
+];
+const MIS_REWARD=[40,80,150], MIS_ALL_BONUS=100, MIS_TIER=['かんたん','ふつう','むずかしい'];
+function todayMissions(d=dayKey()){ const r=mulberry(+d*31+7), used=new Set(); return [0,1,2].map(t=>{ let c=MIS_POOL.filter(m=>m.tier===t&&!used.has(m.key)); if(!c.length) c=MIS_POOL.filter(m=>m.tier===t); const m=c[Math.floor(r()*c.length)%c.length]; used.add(m.key); return m; }); }
+function misState(s){ const d=dayKey(); if(!s.mis||s.mis.day!==d) return {day:d,prog:{},claimed:[],bonus:false}; return {bonus:false,...s.mis,prog:{...s.mis.prog},claimed:[...(s.mis.claimed||[])]}; }
+// 1回のゲーム中の値（run＋今の点数）から、その日の進み具合を計算する
+function misRunVal(m,run,score,done){ if(m.key==='score') return score||0; if(m.key==='noMiss') return (run.miss===0&&done>=20)?1:0; if(m.key==='games') return run.games||0; return run[m.key]||0; }
+function misVal(m,prog,run,score,done){ const saved=prog[m.id]||0, v=run?misRunVal(m,run,score,done):0; return m.mode==='sum'?saved+v:Math.max(saved,v); }
+function misClaimable(s){ const st=misState(s); return todayMissions().filter(m=>(st.prog[m.id]||0)>=m.goal&&!st.claimed.includes(m.id)).length+(st.claimed.length>=3&&!st.bonus?1:0); }
+
+/* ---------- 挑戦状（同じ並びで勝負） ---------- */
+function makeDuelHash(seed,score,name){ return '#vs='+seed.toString(36)+'.'+Math.round(score).toString(36)+'.'+encodeURIComponent(String(name).slice(0,10)); }
+function parseDuelHash(hash){ const m=/^#vs=([0-9a-z]+)\.([0-9a-z]+)\.(.*)$/.exec(hash||''); if(!m) return null;
+  const seed=parseInt(m[1],36), score=parseInt(m[2],36); let name='友だち'; try{ name=decodeURIComponent(m[3]).slice(0,10)||name; }catch(e){}
+  if(!(seed>0&&seed<2147483647)||!(score>=0&&score<1e8)) return null; return {seed,score,name}; }
+function newSeed(){ return 1+Math.floor(Math.random()*2000000000); }
+
 const ROULETTE=[
   { lab:'+3秒',    col:'#3AB0FF', w:22 },
   { lab:'+1000点', col:'#FFB21E', w:20 },
@@ -516,6 +705,9 @@ const ACH = [
   A('qk20','ボス','瞬殺の職人','6秒以内に20体たおす',20,S=>S.quickKills),
   A('fk10','ボス','祭りの勢い','フィーバー中にボスを10体',10,S=>S.feverKills),
   ...BOSSES.map((b,i)=>A('b_'+b.type,'ボス',b.name+' 撃破',`${b.name}をたおす`,1,S=>S.bossTypes.includes(b.type)?1:0,b.type==='king')),
+  A('bk10','ボス','お得意さま','同じボスを10回たおす',10,S=>S.bossKillMax),
+  A('bk50','ボス','ボス専門家','同じボスを50回たおす',50,S=>S.bossKillMax),
+  A('bk100','ボス','ボスマスター','同じボスを100回たおす',100,S=>S.bossKillMax),
   A('bsall','ボス','ボス図鑑コンプリート','12体すべてのボスをたおす',12,S=>S.bossTypes.length),
   A('ev1','イベント','季節のお客さま','イベントボスをたおす',1,S=>S.eventKills),
   A('ev10','イベント','イベントの常連','イベントボスを10体',10,S=>S.eventKills),
@@ -530,6 +722,13 @@ const ACH = [
   A('skall','ガチャ','着せ替えコンプリート','着せ替えを16種類すべて集める',16,S=>S.skinCount),
   A('cn5k','ガチャ','小金持ち','コインを合計5,000枚かせぐ',5000,S=>S.coinsEarned),
   A('cn50k','ガチャ','チョコ長者','コインを合計50,000枚かせぐ',50000,S=>S.coinsEarned),
+  A('du1','ともだち','はじめての勝負','挑戦状で勝負する',1,S=>S.duels),
+  A('dw1','ともだち','返り討ち','挑戦状の勝負に勝つ',1,S=>S.duelWins),
+  A('dw10','ともだち','負け知らず','挑戦状の勝負に10回勝つ',10,S=>S.duelWins),
+  A('dw50','ともだち','挑戦状の王者','挑戦状の勝負に50回勝つ',50,S=>S.duelWins),
+  A('ms1','つづける','ミッション入門','毎日ミッションを1つクリア',1,S=>S.misDone),
+  A('ms30','つづける','ミッションの常連','毎日ミッションを30個クリア',30,S=>S.misDone),
+  A('ms100','つづける','ミッションの鬼','毎日ミッションを100個クリア',100,S=>S.misDone),
   A('sk3','つづける','三日坊主じゃない','3日連続で遊ぶ',3,S=>S.streakMax),
   A('sk7','つづける','一週間の職人','7日連続で遊ぶ',7,S=>S.streakMax),
   A('sk14','つづける','二週間の職人','14日連続で遊ぶ',14,S=>S.streakMax),
@@ -545,7 +744,7 @@ const ACH = [
   A('lv32','つづける','金箔への道','工房レベル32',32,(S,lv)=>lv),
   A('lv45','つづける','レベル45','工房レベル45',45,(S,lv)=>lv),
 ];
-const ACH_CATS=['腕前','積み重ね','特別スティック','運とお祭り','ルーレット','ボス','イベント','ガチャ','つづける'];
+const ACH_CATS=['腕前','積み重ね','特別スティック','運とお祭り','ルーレット','ボス','イベント','ガチャ','ともだち','つづける'];
 const BOX_SIZE=12, GAME_TIME=60, FEVER_TIME=7.5;
 function rankOf(score){
   if(score>=40000) return ['伝説の職人','その指先は、もはや芸術です。'];
@@ -923,11 +1122,14 @@ class Engine{
     if(lv>=1 && r<0.24) type='thin';
     if(lv>=1 && r>(this.fever>0?0.8:0.93)) type='gold';
     if(this.goldQueue>0){ type='gold'; this.goldQueue--; }
-    const target=0.56+r2*0.3;
+    let target=0.56+r2*0.3;
+    if(this.tut){ type='normal'; target=[0.62,0.72,0.66][Math.min(2,this.tut.ok)]; }
     return {type,target,baseT:target,coat:0,pos:-this.H,phase:'enter',enterT:0,prevSub:-1,sub:-1,seed:Math.random()*6,tAlpha:1};
   }
   speed(s){ let v=this.g.L*(0.5+this.level*0.07); if(s.type==='thin') v*=1.45; if(s.type==='gold') v*=1.25;
-    if(this.ab('fast')) v*=this.boss.def.type==='king'?1.35:1.5; return v; }
+    if(this.ab('fast')) v*=this.boss.def.type==='king'?1.35:1.5;
+    if(this.tut){ v*=0.7; if(this.tut.ok===0&&s.coat>s.target-0.09&&s.coat<s.target+0.04) v*=0.3; }
+    return v; }
   surfY(){ const lv=this.level; let amp=lv>=2?Math.min(this.H*0.03,(lv-1)*this.H*0.007):0, sp=1.7;
     if(this.ab('wave')){ amp=this.boss.def.type==='king'?this.H*0.045:this.H*0.055; sp=2.3; }
     this.ampNow=(this.ampNow||0)+(amp-(this.ampNow||0))*0.05;
@@ -935,16 +1137,42 @@ class Engine{
 
   start(store,mode){
     this.running=true; this.holding=false; this.store=store; this.mode=mode; this.idle=false;
-    this.srand = mode==='daily' ? mulberry(+dayKey()*7+13) : Math.random;
+    this.seed = mode==='daily' ? (+dayKey()*7+13) : (mode==='duel'&&store.duel ? store.duel.seed : newSeed());
+    this.srand = mulberry(this.seed);
+    this.blog={}; this.misDefs=mode==='tutorial'?[]:todayMissions(); this.misSt=misState(store); this.misHit=new Set(this.misDefs.filter(m=>(this.misSt.prog[m.id]||0)>=m.goal).map(m=>m.id));
     this.score=0; this.disp=0; this.combo=0; this.chain=0; this.time=GAME_TIME; this.elapsed=0; this.inBox=0; this.done=0; this.level=0;
     this.run=emptyStats(); this.run.newBossDefeated=false; this.judges=[]; this.unlocked=new Set();
     this.particles=[]; this.popups=[]; this.flyers=[]; this.banners=[]; this.toasts=[]; this.ripples=[]; this.lastTick=99;
     this.fever=0; this.feverKind='normal'; this.gauge=0; this.slot=null; this.holds=[]; this.roul=null; this.goldQueue=0; this.darkA=0; this.superDim=0;
     this.boss=null; this.roulCount=0; this.bonusT=0; this.nextBossAt=10; this.prog=Math.min(BOSSES.length,store.bossProg||0); this.encounters=0; this.sinceNew=0; this.eventDone=false; this.newKills=0; this.newEscapes=0; this.lastBossType=null; this.run.eventTypes=[];
     this.startDelay=1.6; this.goShown=false; this.slotTickT=0; this.timers=[]; this.slowmo=null; this.plate=null; this.stamp=null; this.shocks=[]; this.strand=null; this.men=0;
+    if(mode==='tutorial'){ this.nextBossAt=1e9; this.startDelay=0.8; this.tut={ok:0,tries:0,msg:'',now:false,fb:null,fbT:0,end:false}; } else this.tut=null;
     this.stick=this.newStick();
     this.popup('よーい…',this.W/2,this.jy(),'#FFF3DE',34,1.2);
     Snd.start(); this.pushHud(true);
+  }
+  tutAfter(res,c,tg){
+    const T=this.tut; T.tries++;
+    if(res==='miss'){ T.fb=c>=0.985?'深すぎ！ 持ち手までつかってしまった':(c<tg?'うすづけ… もう少し長く押してみよう':'つけすぎ… 矢印の少し手前ではなそう'); }
+    else { T.ok++; T.fb=T.ok>=3?'かんぺき！ 練習かんりょう':(res==='perfect'?'パーフェクト！ ':'グッド！ ')+`あと${3-T.ok}本`; }
+    T.fbT=2.2;
+    if(T.ok>=3&&!T.end){ T.end=true; this.banner('練習かんりょう！','本番は60秒。ボスやフィーバーも出てくるよ',true,'rainbow');
+      this.confetti(60); Snd.levelUp&&Snd.levelUp();
+      this.later(1.8,()=>{ this.running=false; this.holding=false; Snd.bgmStop(); this.hooks.tutDone&&this.hooks.tutDone(); }); }
+  }
+  tutTick(dt){
+    const T=this.tut, s=this.stick; if(!T||!s) return;
+    if(T.fbT>0) T.fbT-=dt;
+    let msg='', now=false;
+    if(T.end) msg='';
+    else if(s.phase==='ready'||s.phase==='enter') msg=T.ok===0?'画面を長押しして、スティックをチョコにひたそう':(T.ok===1?'金の矢印の高さまで、自分のタイミングで':'最後はヒントなし！ 矢印にぴったり合わせよう');
+    else if(s.phase==='down'){ if(T.ok<2){ if(s.coat>=s.target-0.035){ msg='今！ 指をはなす'; now=true; } else msg='チョコが金の矢印に届いたら、指をはなす'; } else msg=''; }
+    const ch=T.msg!==msg||T.now!==now; T.msg=msg; T.now=now; if(ch) this.pushHud(true);
+  }
+  checkMis(){
+    if(!this.misDefs||!this.misDefs.length||!this.running) return;
+    for(const m of this.misDefs){ if(this.misHit.has(m.id)) continue;
+      if(misVal(m,this.misSt.prog,this.run,this.score,this.done)>=m.goal){ this.misHit.add(m.id); this.toast('ミッション達成！ '+m.text,'#9FE8B0'); Snd.achieve(); } }
   }
   later(sec,fn){ (this.timers||(this.timers=[])).push({t:sec,fn}); }
   addTime(sec){ const g=Math.max(0,Math.min(sec,10-(this.bonusT||0))); this.bonusT=(this.bonusT||0)+g; this.time+=g; return g; }
@@ -960,6 +1188,7 @@ class Engine{
 
   liveStats(){ const r=this.run; r.bestScore=this.score; r.maxFeverRun=r.fevers; r.maxBossRun=r.bossKills; return mergeStats(this.store.stats,r); }
   checkAch(){
+    if(this.tut) return;
     const S=this.liveStats(), lv=levelInfo(this.store.xp).lv;
     for(const a of ACH){ if(this.store.ach.includes(a.id)||this.unlocked.has(a.id)) continue;
       if(a.val(S,lv)>=a.goal){ this.unlocked.add(a.id); this.achQ=(this.achQ||[]); this.achQ.push(a.name); } }
@@ -983,7 +1212,7 @@ class Engine{
 
   /* ---------- トリュフくじ（在庫つき） ---------- */
   addHold(pWin){
-    if(!this.running) return;
+    if(!this.running||this.tut) return;
     if(this.holds.length>=4){ this.score+=200; return; }
     const win=Math.random()<pWin;
     const r=Math.random(), col=win?(r<0.2?'rainbow':(r<0.75?'gold':'normal')):(r<0.12?'gold':'normal');
@@ -1097,6 +1326,7 @@ class Engine{
     const pl=this.chooseBoss(), def=pl.def;
     const hp=Math.round(def.hp*pl.hpMul);
     this.encounters++; this.sinceNew=pl.isNew?0:this.sinceNew+1; this.lastBossType=def.type;
+    const lg=this.blog[def.type]||(this.blog[def.type]={k:0,met:0,esc:0,fast:null}); lg.met++;
     this.boss={def,plan:pl,hp,max:hp,t:0,st:0,dur:def.dur||13,state:'warn',enterT:0,hitT:0,downT:0,shk:0,sq:0};
     this.holding=false; haptic([60,60,60]);
     Snd.warn(); Snd.bgm.boss=true;
@@ -1113,6 +1343,7 @@ class Engine{
       if(b.plan.isEvent){ this.eventDone=true; this.run.eventKills++; if(!this.run.eventTypes.includes(b.def.type)) this.run.eventTypes.push(b.def.type); }
       else if(!this.run.bossTypes.includes(b.def.type)) this.run.bossTypes.push(b.def.type);
       if(b.t<6) this.run.quickKills++;
+      { const lg=this.blog[b.def.type]||(this.blog[b.def.type]={k:0,met:1,esc:0,fast:null}); lg.k++; lg.fast=lg.fast==null?b.t:Math.min(lg.fast,b.t); }
       if(this.fever>0) this.run.feverKills++;
       if(b.plan.isNew){ this.run.newBossDefeated=true; this.newKills++; this.newEscapes=0; this.prog=Math.min(BOSSES.length,this.prog+1); }
       const bonus=Math.round(b.def.bonus*(b.plan.enh?1.5:1));
@@ -1126,10 +1357,11 @@ class Engine{
       if(this.gauge>=1) this.later(1.2,()=>this.startFever());
     } else {
       b.state='escape'; b.downT=0; if(b.plan.isNew) this.newEscapes++;
+      if(this.blog[b.def.type]) this.blog[b.def.type].esc++;
       this.popup(b.def.name+'に逃げられた…',this.W/2,this.jy(),'#FFB4A0',20,1.4); Snd.nearMiss();
     }
     this.nextBossAt=this.elapsed+7;
-    Snd.bgm.boss=false; this.checkAch();
+    Snd.bgm.boss=false; this.checkAch(); this.checkMis();
   }
   bossLanded(b){
     const bp=this.bossPos();
@@ -1219,21 +1451,34 @@ class Engine{
         this.addHold(0.3);
       } else if(res==='perfect' && s.type==='gold'){ this.addHold(0.4); }
     }
-    this.level=Math.min(8,Math.floor(this.done/4));
+    if(this.tut) this.tutAfter(res,c,tg);
+    this.level=this.tut?0:Math.min(8,Math.floor(this.done/4));
     this.stick=this.newStick();
     if(this.stick.type==='gold'){ this.later(0.15,()=>{ if(this.running){ Snd.kyuin(); this.flash=0.3; this.flashCol='255,220,120'; this.toast('金のスティック！ 3倍','#FFD166'); } }); }
     else if(this.stick.type==='thin') Snd.shakin();
-    this.checkAch(); this.pushHud(true);
+    this.checkAch(); this.checkMis(); this.pushHud(true);
   }
 
   finish(){
+    if(this.tut){ this.running=false; return; }
     this.running=false; this.holding=false; Snd.bgmStop(); Snd.finish(); this.slot=null; this.roul=null; this.darkA=0; this.superDim=0; this.slowmo=null; this.plate=null;
     if(this.boss&&this.boss.state==='finish'){ this.slowmo=null; this.endBoss(true); }
     if(this.boss&&this.boss.state==='fight') this.endBoss(false);
     const prev=loadStore(), today=dayKey(), firstToday=prev.lastDay!==today;
     let streak=prev.streak||0; if(firstToday) streak = prev.lastDay===yesterdayKey()?streak+1:1;
     const r=this.run; r.games=1; r.bestScore=this.score; r.maxFeverRun=r.fevers; r.maxBossRun=r.bossKills;
+    const duel=this.mode==='duel'&&prev.duel?prev.duel:null;
+    if(duel){ r.duels=1; r.duelWins=this.score>duel.score?1:0; }
     r.noMissGames=(r.miss===0&&this.done>=20)?1:0; r.dailyGames=this.mode==='daily'?1:0; r.flavorsPlayed=[this.fl.id]; r.streakMax=streak;
+    // ボス記録
+    const bossLog={...(prev.bossLog||{})}; const md=(new Date().getMonth()+1)+'/'+new Date().getDate();
+    for(const [k,v] of Object.entries(this.blog)){ const o={k:0,met:0,esc:0,fast:null,first:null,...(bossLog[k]||{})};
+      o.k+=v.k; o.met+=v.met; o.esc+=v.esc; if(v.fast!=null) o.fast=o.fast==null?v.fast:Math.min(o.fast,v.fast); if(v.k>0&&!o.first) o.first=md; bossLog[k]=o; }
+    r.bossKillMax=Math.max(0,...Object.values(bossLog).map(o=>o.k||0));
+    // ミッション
+    const mis=misState(prev); const misBefore={...mis.prog};
+    for(const m of this.misDefs){ mis.prog[m.id]=misVal(m,mis.prog,r,this.score,this.done); }
+    const misNew=this.misDefs.filter(m=>(misBefore[m.id]||0)<m.goal&&mis.prog[m.id]>=m.goal).map(m=>m.id);
     const stats=mergeStats(prev.stats,r);
     const name=displayName(prev);
     const rank=prev.rank.slice(); const entry={name,score:this.score,date:(new Date().getMonth()+1)+'/'+new Date().getDate(),id:Date.now()};
@@ -1253,11 +1498,16 @@ class Engine{
     const coins=Math.floor(this.score/100)+r.bossKills*15+r.eventKills*(eventBoss().coins)+newAch.length*10+(daily1?50:0);
     stats.coinsEarned=(stats.coinsEarned||0)+coins;
     const nextBoss=BOSSES[bossProg]||null;
-    const next={...prev,best:Math.max(prev.best,this.score),ach:[...achAll],xp:xpAfter,lastDay:today,streak,stats,rank:top,bossProg,coins:(prev.coins||0)+coins};
+    const next={...prev,best:Math.max(prev.best,this.score),ach:[...achAll],xp:xpAfter,lastDay:today,streak,stats,rank:top,bossProg,coins:(prev.coins||0)+coins,bossLog,mis};
+    let duelRes=null;
+    if(duel){ const win=this.score>duel.score, draw=this.score===duel.score; const rec={w:0,l:0,d:0,...(prev.duelRec||{})};
+      if(win) rec.w++; else if(draw) rec.d++; else rec.l++; next.duelRec=rec;
+      next.duel={...duel,my:Math.max(duel.my||0,this.score),tries:(duel.tries||0)+1};
+      duelRes={name:duel.name,score:duel.score,win,draw,diff:this.score-duel.score,rec,my:next.duel.my}; }
     saveStore(next);
     this.banner('しゅうりょう！','',true);
     const res={score:this.score,mode:this.mode,run:{...r},judges:this.judges.slice(),newAch,isBest,prevBest:prev.best,localPos:pos>=0?pos+1:null,entryId:entry.id,
-      xpBefore:prev.xp,xpAfter,xpGain,achXp,streak,streakBonus,firstToday,daily1,newBoss,newBosses,nextBoss,bossProg,coins,coinsTotal:next.coins};
+      seed:this.seed,duel:duelRes,misNew,mis,xpBefore:prev.xp,xpAfter,xpGain,achXp,streak,streakBonus,firstToday,daily1,newBoss,newBosses,nextBoss,bossProg,coins,coinsTotal:next.coins};
     setTimeout(()=>this.hooks.end(res),1300);
   }
 
@@ -1265,7 +1515,7 @@ class Engine{
     if(!force && this.t-this.lastHud<0.05) return;
     this.lastHud=this.t;
     this.hooks.hud({score:Math.round(this.disp),time:Math.max(0,this.time||0),combo:this.combo||0,inBox:this.inBox||0,boxes:this.run?this.run.boxes:0,gauge:this.gauge,fever:this.fever,feverMax:this.feverKind==='super'?10:FEVER_TIME,feverKind:this.feverKind,
-      holds:(this.holds||[]).map(x=>x.col)});
+      holds:(this.holds||[]).map(x=>x.col), tut:this.tut?{ok:this.tut.ok,msg:this.tut.msg,now:this.tut.now,fb:this.tut.fbT>0?this.tut.fb:null}:null});
   }
 
   update(dt){
@@ -1275,7 +1525,7 @@ class Engine{
       if(this.startDelay>0){
         this.startDelay-=dt;
         if(this.startDelay<=0 && !this.goShown){ this.goShown=true; Snd.bgmStart(); this.popup('スタート！',this.W/2,this.jy(),'#F4DFA4',42,0.9); }
-      } else if(!this.paused()){
+      } else if(!this.paused()&&!this.tut){
         this.time-=dt*(this.ab('drain')?1.4:1); this.elapsed+=dt;
         const sec=Math.ceil(this.time);
         if(sec<=5 && sec>0 && sec!==this.lastTick){ this.lastTick=sec; Snd.note(1000,{type:'square',dur:0.05,vol:0.04,wet:0}); }
@@ -1285,6 +1535,7 @@ class Engine{
         if(Math.random()<dt*(this.feverKind==='super'?30:16)) this.confetti(1);
         if(this.fever<=0){ this.fever=0; Snd.bgm.fever=false; this.toast('フィーバー終了','#FFF3DE'); } }
       this.updHolds(dt);
+      if(this.tut) this.tutTick(dt);
     }
     this.disp+=(this.score-this.disp)*Math.min(1,dt*10); if(Math.abs(this.score-this.disp)<1) this.disp=this.score;
     if(this.running) this.pushHud(false);
@@ -1693,8 +1944,20 @@ class Engine{
 /* ================= 画面（React） ================= */
 const { useState, useEffect, useRef } = React;
 // 実際に見えている画面の高さを測る（Safariの下のバーに隠れないように）
-(function(){ const set=()=>{ const vv=window.visualViewport; const hh=Math.round(Math.min(window.innerHeight,vv?vv.height:1e9)); document.documentElement.style.setProperty('--appH',hh+'px'); };
-  set(); window.addEventListener('resize',set); window.addEventListener('orientationchange',()=>setTimeout(set,300)); if(window.visualViewport) window.visualViewport.addEventListener('resize',set); setTimeout(set,500); })();
+(function(){
+  let probe=null;
+  const svh=()=>{ try{ if(!probe){ probe=document.createElement('div'); probe.style.cssText='position:fixed;left:0;top:0;width:1px;height:100vh;height:100svh;visibility:hidden;pointer-events:none;z-index:-1'; document.body.appendChild(probe); } return probe.offsetHeight||1e9; }catch(e){ return 1e9; } };
+  const set=()=>{ const vv=window.visualViewport, de=document.documentElement;
+    const hh=Math.round(Math.min(window.innerHeight||1e9, vv?vv.height:1e9, de.clientHeight||1e9, svh()));
+    if(!(hh>200&&hh<5000)) return;
+    de.style.setProperty('--appH',hh+'px');
+    de.setAttribute('data-h',[800,720,700,620].filter(x=>hh<=x).map(x=>'h'+x).join(' '));
+    if(window.scrollY) window.scrollTo(0,0); };
+  const later=()=>{ set(); setTimeout(set,120); setTimeout(set,500); };
+  if(document.body) set(); else document.addEventListener('DOMContentLoaded',set);
+  window.addEventListener('resize',later); window.addEventListener('orientationchange',()=>setTimeout(later,300)); window.addEventListener('pageshow',later);
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) later(); });
+  if(window.visualViewport) window.visualViewport.addEventListener('resize',later); setTimeout(set,500); setTimeout(set,1500); })();
 const h = React.createElement;
 const fmt=n=>Number(n||0).toLocaleString('ja-JP');
 const Ic=(k,cls)=>h('img',{src:IMG_SRC['ic_'+k],alt:'',className:cls,draggable:false});
@@ -1733,8 +1996,29 @@ function RankBody({store,initTab,refreshKey}){
     body);
 }
 
-const CAT_IC={'腕前':'medal','積み重ね':'box','特別スティック':'flavor','運とお祭り':'fire','ルーレット':'rank','ボス':'crown','つづける':'fire'};
+const CAT_IC={'腕前':'medal','積み重ね':'box','特別スティック':'flavor','運とお祭り':'fire','ルーレット':'rank','ボス':'crown','イベント':'crown','ガチャ':'gacha','ともだち':'rank','つづける':'fire'};
+function BossDetail({b,store,isEvent,onClose}){
+  const lg=(store.bossLog||{})[b.type]||{}, k=lg.k||0, rk=bossRank(k), seen=k>0;
+  const nextGoal=[1,10,30,100].find(g=>g>k);
+  return h('div',{className:'bdbg',onClick:onClose},h('div',{className:'bdcard',onClick:e=>e.stopPropagation()},
+    h('button',{className:'bdx',onClick:onClose,'aria-label':'とじる'},'×'),
+    h('div',{className:'bdtop'},h('img',{src:IMG_SRC['boss_'+b.type],alt:'',className:seen||isEvent?'':'sil'}),
+      h('div',null,h('small',null,isEvent?'イベントボス':'ボス'),h('b',null,b.name),
+        h('div',{className:'bdrank r'+rk.n},'★'.repeat(rk.n),h('i',null,'★'.repeat(4-rk.n)),h('span',null,rk.lab)))),
+    h('p',{className:'bdprof'},seen?BOSS_PROF[b.type]:'たおすとプロフィールが読めるようになります。'),
+    h('div',{className:'bdstats'},
+      h('div',null,h('small',null,'たおした数'),h('b',null,k+'回')),
+      h('div',null,h('small',null,'最速撃破'),h('b',null,fmtSec(lg.fast))),
+      h('div',null,h('small',null,'出会った数'),h('b',null,(lg.met||0)+'回')),
+      h('div',null,h('small',null,'逃げられた'),h('b',null,(lg.esc||0)+'回')),
+      h('div',null,h('small',null,'体力'),h('b',null,b.hp)),
+      h('div',null,h('small',null,'はじめて撃破'),h('b',null,lg.first||'—'))),
+    nextGoal&&h('p',{className:'note',style:{textAlign:'center',margin:0}},`あと${nextGoal-k}回たおすと「${bossRank(nextGoal).lab}」ランク`),
+    h('p',{className:'cat'},'能力と攻略のコツ'),
+    h('div',{className:'bdtips'},b.ab.map(a=>h('div',{key:a},h('b',null,AB_NAME[a]),h('span',null,AB_TIP[a]))))));
+}
 function AchBody({store,bossOnly}){
+  const [sel,setSel]=useState(null);
   const S=store.stats, lv=levelInfo(store.xp).lv, done=ACH.filter(a=>store.ach.includes(a.id)).length;
   return h(React.Fragment,null,
     !bossOnly&&h('div',{className:'achtop'},h('div',{className:'ring',style:{'--p':Math.round(done/ACH.length*100)}},h('b',null,Math.round(done/ACH.length*100)+'%')),
@@ -1749,17 +2033,24 @@ function AchBody({store,bossOnly}){
           h('span',{className:'ap'+(ok?' ok':'')},ok?'達成':`${fmt(v)}/${fmt(a.goal)}`));
       })))),
     h('p',{className:'cat'},`ボス図鑑 ${S.bossTypes.length} / ${BOSSES.length}`),
-    h('p',{className:'note'},'ボスは次々に登場し、たおしたボスは全員また出てきます。新ボスをたおすと、そのゲームの中で次の新ボスが現れます。'),
-    h('div',{className:'bossgrid'},BOSSES.map((b,i)=>{ const ok=S.bossTypes.includes(b.type), next=i===(store.bossProg||0);
-      return h('div',{key:b.type,className:'bosscard'+(ok?'':' lock')+(next?' next':'')},h('img',{src:IMG_SRC['boss_'+b.type],alt:''}),
+    h('p',{className:'note'},'ボスは次々に登場し、たおしたボスは全員また出てきます。新ボスをたおすと、そのゲームの中で次の新ボスが現れます。同じボスをたくさんたおすと★ランクが上がります。'),
+    h('div',{className:'bossgrid'},BOSSES.map((b,i)=>{ const ok=S.bossTypes.includes(b.type), next=i===(store.bossProg||0), lg=(store.bossLog||{})[b.type]||{}, rk=bossRank(lg.k||0);
+      return h('button',{key:b.type,className:'bosscard'+(ok?'':' lock')+(next?' next':''),onClick:()=>(ok||next)&&setSel({b})},
+        ok&&lg.k>0&&h('i',{className:'bkill r'+rk.n},'×'+lg.k),
+        h('img',{src:IMG_SRC['boss_'+b.type],alt:''}),
         h('b',null,ok?`${i+1}. ${b.name}`:(next?`${i+1}. 次の新ボス`:`${i+1}. ？？？`)),
         h('span',null,ok?b.desc:(next?'能力：'+b.ab.map(a=>AB_NAME[a]).join('・'):'まだ出会っていない')),
         ok&&h('em',null,'能力：'+b.ab.map(a=>AB_NAME[a]).join('・'))); })),
     h('p',{className:'cat'},'イベントボス（週替わり）'),
     h('div',{className:'bossgrid'},EVENT_BOSSES.map(b=>{ const ok=(S.eventTypes||[]).includes(b.type), now=eventBoss().type===b.type;
-      return h('div',{key:b.type,className:'bosscard'+(ok||now?'':' lock')+(now?' next':'')},h('img',{src:IMG_SRC['boss_'+b.type],alt:'',style:now&&!ok?{filter:'drop-shadow(0 0 8px '+b.aura+')'}:null}),
+      const lg=(store.bossLog||{})[b.type]||{}, rk=bossRank(lg.k||0);
+      return h('button',{key:b.type,className:'bosscard'+(ok||now?'':' lock')+(now?' next':''),onClick:()=>(ok||now)&&setSel({b,ev:true})},
+        ok&&lg.k>0&&h('i',{className:'bkill r'+rk.n},'×'+lg.k),
+        h('img',{src:IMG_SRC['boss_'+b.type],alt:'',style:now&&!ok?{filter:'drop-shadow(0 0 8px '+b.aura+')'}:null}),
         h('b',null,ok||now?b.name:'？？？'),h('span',null,now?'今週登場中！ '+b.desc:(ok?b.desc:'別の週に登場')),
-        (ok||now)&&h('em',null,'能力：'+b.ab.map(a=>AB_NAME[a]).join('・'))); })));
+        (ok||now)&&h('em',null,'能力：'+b.ab.map(a=>AB_NAME[a]).join('・'))); })),
+    bossOnly&&h('p',{className:'note',style:{textAlign:'center'}},'ボスをタップすると、プロフィールと攻略のコツが見られます'),
+    sel&&h(BossDetail,{b:sel.b,store,isEvent:sel.ev,onClose:()=>setSel(null)}));
 }
 
 function MiniStick({coat}){
@@ -1876,23 +2167,40 @@ function FlavorBody({store,setStore}){
         on&&h('span',{className:'check'},'✓')); })));
 }
 
-function SettingsBody({store,setStore,sound,setSound}){
+function SettingsBody({store,setStore,sound,setSound,onClose,onTutorial}){
   const upd=p=>{ const n={...store,...p}; setStore(n); saveStore(n); };
+  const [ask,setAsk]=useState(null), [doneMsg,setDoneMsg]=useState('');
+  const doReset=(kind)=>{ const cur=loadStore(); let n;
+    if(kind==='all'){ n=defStore(); n.pid=cur.pid; n.name=cur.name; }
+    else { n={...cur, best:0, bests:{}, rank:[], stats:emptyStats(), xp:0, ach:[], bossProg:0, streak:0, lastDay:'', spinDay:'', bossLog:{}, mis:null, duelRec:{w:0,l:0,d:0}, duel:null}; }
+    saveStore(n); setStore(n); setAsk(null); setDoneMsg(kind==='all'?'すべてのデータをリセットしました':'記録とレベルをリセットしました'); Snd.milestone&&Snd.milestone(); };
   return h(React.Fragment,null,
     h('div',{className:'field'},h('label',{htmlFor:'pname'},'職人名（ランキングに表示されます）'),
       h('input',{id:'pname',maxLength:10,placeholder:displayName({...store,name:''}),value:store.name,onChange:e=>upd({name:e.target.value})})),
     h('div',{className:'toggle'},h('span',null,'効果音とBGM'),h('button',{className:'sw'+(sound?' on':''),onClick:()=>setSound(!sound),'aria-pressed':sound,'aria-label':'音のオンとオフ'})),
     h('p',{className:'cat'},'あそびかた'),
+    h('button',{className:'cbtn sm green',onClick:onTutorial},h('span',{className:'main'},'練習モードで遊ぶ'),h('small',null,'3本だけ、ヒントつきで練習できます')),
     h('div',{className:'howto'},
       h('div',null,h('b',null,'1'),h('span',null,'画面を長押しするとスティックがチョコに沈みます。指をはなすと引き上げます。')),
       h('div',null,h('b',null,'2'),h('span',null,'金色の矢印の高さでぴったり止めるとパーフェクト。左のメーターでも確認できます。')),
       h('div',null,h('b',null,'3'),h('span',null,'パーフェクトでゲージがたまり、満タンでフィーバー（得点2倍）。金色のトリュフがそろうと超フィーバー（3倍）。')),
       h('div',null,h('b',null,'4'),h('span',null,'箱の完成・10コンボ・金のパーフェクトでトリュフくじが引けます。3つそろうとフィーバー。トリュフが金や虹色だと当たりやすい。')),
       h('div',null,h('b',null,'5'),h('span',null,'ボスは次々に登場。たおしたボスは全員また出てきます。新ボスは出やすく、たおせば同じゲームの中で次の新ボスへ。')),
-      h('div',null,h('b',null,'6'),h('span',null,'ボスをたおすとボーナスルーレット（1回のゲームで2回まで）。週替わりのイベントボスはコインがたくさん。コインで着せ替えガチャ（80回で天井）。'))));
+      h('div',null,h('b',null,'6'),h('span',null,'ボスをたおすとボーナスルーレット（1回のゲームで2回まで）。週替わりのイベントボスはコインがたくさん。コインで着せ替えガチャ（80回で天井）。'))),
+    h('p',{className:'cat'},'データのリセット'),
+    doneMsg?h('div',{className:'rankin'},doneMsg):null,
+    !ask? h('div',{className:'resetbox'},
+      h('button',{className:'cbtn sm blue',onClick:()=>{setDoneMsg('');setAsk('rec');}},h('span',{className:'main'},'記録だけ消す'),h('small',null,'コインと着せ替えはそのまま')),
+      h('button',{className:'cbtn sm red',onClick:()=>{setDoneMsg('');setAsk('all');}},h('span',{className:'main'},'すべて消す'),h('small',null,'コイン・着せ替え・ガチャも最初から')))
+    : h('div',{className:'resetask'},
+      h('p',null,ask==='all'?'本当にすべてのデータを消しますか？　元には戻せません。':'自己ベスト・ランキング記録・レベル・実績・ボス図鑑・ミッション・挑戦状の成績・連続ログインを消しますか？　元には戻せません。'),
+      h('p',{className:'note'},'名前はそのまま残ります。全国ランキングは次にプレイしたときの点数に書きかわります。'),
+      h('div',{className:'resetbox'},
+        h('button',{className:'cbtn sm',style:{'--b1':'#E4D8C8','--b2':'#B0A090','--b3':'#86766A','--b4':'#54463A'},onClick:()=>setAsk(null)},h('span',{className:'main'},'やめる')),
+        h('button',{className:'cbtn sm red',onClick:()=>doReset(ask)},h('span',{className:'main'},'消す')))));
 }
 
-function DailyWheel({store,setStore}){
+function DailyWheel({store,setStore,onClose}){
   const cv=useRef(null), st=useRef({ang:0,spin:null,hi:-1}), [res,setRes]=useState(null);
   const done=store.spinDay===dayKey();
   useEffect(()=>{ let raf; const c=cv.current, ctx=c.getContext('2d'), dpr=Math.min(2,window.devicePixelRatio||1); const S=280; c.width=S*dpr; c.height=S*dpr;
@@ -1916,13 +2224,46 @@ function DailyWheel({store,setStore}){
     h('p',{className:'note',style:{textAlign:'center'}},'1日1回、無料で回せます。止まった数字の経験値がもらえます。'),
     h('canvas',{ref:cv,style:{width:280,height:280,display:'block',margin:'0 auto'}}),
     res!=null?h('div',{className:'rankin'},`${res} 経験値ゲット！`):null,
-    h('button',{className:'cbtn '+(done?'blue sm':'yellow'),onClick:spin,disabled:done&&res==null},h('span',{className:'main'},done?(res!=null?'また明日！':'今日はもう回しました'):'回す！')));
+    h('button',{className:'cbtn '+(done?'blue sm':'yellow'),onClick:done?onClose:spin},h('span',{className:'main'},done?(res!=null?'また明日！':'今日はもう回しました'):'回す！')));
+}
+
+function untilTomorrow(){ const n=new Date(), t=new Date(n.getFullYear(),n.getMonth(),n.getDate()+1); const m=Math.max(0,Math.round((t-n)/60000)); return `${Math.floor(m/60)}時間${m%60}分`; }
+function MissionBody({store,setStore}){
+  const st=misState(store), list=todayMissions(), [fx,setFx]=useState(null);
+  const claim=(m,i)=>{ const s=loadStore(), ms=misState(s); if(ms.claimed.includes(m.id)||(ms.prog[m.id]||0)<m.goal) return;
+    ms.claimed.push(m.id); s.mis=ms; const c=MIS_REWARD[m.tier]; s.coins=(s.coins||0)+c; s.stats.misDone=(s.stats.misDone||0)+1; s.stats.coinsEarned=(s.stats.coinsEarned||0)+c;
+    const got=checkStoreAch(s); saveStore(s); setStore(s); setFx(`コイン ＋${c}`+(got.length?`・実績「${got[0].name}」解除`:'')); Snd.milestone(); };
+  const claimAll=()=>{ const s=loadStore(), ms=misState(s); if(ms.claimed.length<3||ms.bonus) return; ms.bonus=true; s.mis=ms; s.coins=(s.coins||0)+MIS_ALL_BONUS; s.stats.coinsEarned=(s.stats.coinsEarned||0)+MIS_ALL_BONUS;
+    saveStore(s); setStore(s); setFx(`全部クリアボーナス コイン ＋${MIS_ALL_BONUS}`); Snd.jackpot(); };
+  const all=st.claimed.length>=3;
+  return h(React.Fragment,null,
+    h('p',{className:'note',style:{textAlign:'center'}},`毎日0時に入れかわります（あと${untilTomorrow()}）。全員同じミッションなので、友だちと競えます。`),
+    fx&&h('div',{className:'rankin'},fx),
+    h('div',{className:'mislist'},list.map((m,i)=>{ const v=Math.min(m.goal,st.prog[m.id]||0), ok=v>=m.goal, got=st.claimed.includes(m.id);
+      return h('div',{key:m.id,className:'misrow'+(ok?' ok':'')+(got?' got':'')},
+        h('span',{className:'mtier t'+m.tier},MIS_TIER[m.tier]),
+        h('div',{className:'mmain'},h('b',null,m.text),h('div',{className:'pbar'},h('i',{style:{width:(v/m.goal*100)+'%'}})),h('small',null,m.mode==='max'?(ok?'達成！':'1回のゲームの記録で判定'):`${fmt(v)} / ${fmt(m.goal)}`)),
+        got?h('span',{className:'mgot'},'受け取り済み'):
+          h('button',{className:'cbtn sm '+(ok?'yellow':'gray'),disabled:!ok,onClick:()=>claim(m,i)},h('span',{className:'main'},ok?'受け取る':'＋'+MIS_REWARD[m.tier]),ok&&h('small',null,'コイン＋'+MIS_REWARD[m.tier]))); })),
+    h('div',{className:'misall'+(all&&!st.bonus?' ready':'')},
+      h('div',null,h('b',null,'3つ全部クリアでボーナス'),h('small',null,st.bonus?'受け取り済み。また明日！':`コイン＋${MIS_ALL_BONUS}（いま ${st.claimed.length} / 3）`)),
+      !st.bonus&&h('button',{className:'cbtn sm '+(all?'yellow':'gray'),disabled:!all,onClick:claimAll},h('span',{className:'main'},'受け取る'))));
 }
 
 function EventCard({store,onOpen}){
   const ev=eventBoss(), done=(store.stats.eventTypes||[]).includes(ev.type);
   return h('button',{className:'evcard',onClick:onOpen,style:{'--au':ev.aura}},h('img',{src:IMG_SRC['boss_'+ev.type],alt:''}),
     h('div',null,h('small',null,`今週のイベントボス・あと${eventDaysLeft()}日`),h('b',null,ev.name),h('span',null,`たおすとコイン${ev.coins}枚${done?'・撃破済み':''}`)));
+}
+function DuelCard({store,setStore,onStart}){
+  const d=store.duel; if(!d) return null;
+  const done=d.my!=null, win=done&&d.my>d.score;
+  const close=()=>{ const s=loadStore(); s.duel=null; saveStore(s); setStore(s); };
+  return h('div',{className:'duelcard'},
+    h('button',{className:'dclose',onClick:close,'aria-label':'挑戦状をとじる'},'×'),
+    h('div',{className:'dl'},h('small',null,'挑戦状がとどいています'),h('b',null,`${d.name} さん　${fmt(d.score)}点`),
+      h('span',null,done?(win?`勝ち！ あなたの最高 ${fmt(d.my)}点`:`まだ負け… あなたの最高 ${fmt(d.my)}点`):'同じ並びのスティックで勝負！')),
+    h('button',{className:'cbtn sm '+(done&&win?'blue':'red'),onClick:()=>onStart('duel')},h('span',{className:'main'},done?(win?'もう一度':'リベンジ'):'受けて立つ')));
 }
 function Home({store,setStore,onStart,openSheet}){
   const L=levelInfo(store.xp), firstToday=store.lastDay!==dayKey(), nextStreak=store.lastDay===yesterdayKey()?(store.streak||0)+1:1;
@@ -1939,9 +2280,9 @@ function Home({store,setStore,onStart,openSheet}){
     h('div',{className:'tagline outl'},'ひたして、すくって、ぴたりと止めろ'),
     h('div',{className:'homespace'}),
     h('div',{className:'actions'},
-      h(EventCard,{store,onOpen:()=>openSheet('ach','boss')}),
+      store.duel?h(DuelCard,{store,setStore,onStart}):h(EventCard,{store,onOpen:()=>openSheet('ach','boss')}),
       store.best>0&&h('div',{className:'bestline outl'},'自己ベスト ',h('b',null,fmt(store.best)),' 点'),
-      h('button',{className:'cbtn yellow',onClick:()=>onStart('normal')},h('span',{className:'main'},'スタート'),h('small',null,'いつもの工房・60秒')),
+      h('button',{className:'cbtn yellow',onClick:()=>onStart('normal')},h('span',{className:'main'},'スタート'),h('small',null,firstToday?`60秒・今日の初回 ＋${Math.min(nextStreak,7)*30}経験値`:'いつもの工房・60秒')),
       h('button',{className:'cbtn red sm',onClick:()=>onStart('daily')},
         h('span',{className:'main'},`今日のお題 ${+d.slice(4,6)}/${+d.slice(6)}`),
         h('small',null,qBest>=0?`今日の最高 ${fmt(qBest)}点・何回でも挑戦OK`:'全員同じ並びで勝負・初回は経験値2倍'),
@@ -1949,7 +2290,12 @@ function Home({store,setStore,onStart,openSheet}){
       h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}},
         h('button',{className:'cbtn '+(store.spinDay===dayKey()?'blue':'green')+' sm',onClick:()=>openSheet('wheel')},h('span',{className:'main'},'今日のルーレット'),h('small',null,store.spinDay===dayKey()?'また明日':'1日1回 無料'),store.spinDay!==dayKey()&&h('span',{className:'badge-new'},'！')),
         h('button',{className:'cbtn blue sm',onClick:()=>openSheet('ach','boss')},h('span',{className:'main'},'ボス図鑑'),h('small',null,`${(store.stats.bossTypes||[]).length} / ${BOSSES.length} 体`))),
-      firstToday&&h('div',{className:'bestline outl'},`今日の初回ボーナス ＋${Math.min(nextStreak,7)*30} 経験値`)),
+      (()=>{ const st=misState(store), list=todayMissions(), cl=misClaimable(store), okN=list.filter(m=>(st.prog[m.id]||0)>=m.goal).length;
+        return h('button',{className:'misbar'+(cl?' ready':''),onClick:()=>openSheet('mission')},
+          h('span',{className:'mt'},'今日のミッション'),
+          h('span',{className:'dots'},list.map((m,i)=>h('i',{key:i,className:st.claimed.includes(m.id)?'got':((st.prog[m.id]||0)>=m.goal?'ok':'')}))),
+          h('span',{className:'ms'},cl?'受け取れる！':(st.bonus?'全部クリア！':`${okN} / 3`)),
+          cl>0&&h('span',{className:'badge-new'},'！')); })()),
     h('nav',{className:'tabbar'},
       [['home','ホーム','home'],['rank','ランキング','rank'],['gacha','ガチャ','gacha'],['ach','実績','medal'],['dress','着せ替え','shirt']].map(([k,l,ic])=>
         h('button',{key:k,className:'tab'+(k==='home'?' on':''),onClick:()=>k!=='home'&&openSheet(k)},Ic(ic),l))));
@@ -1992,7 +2338,8 @@ function Result({r,store,onRetry,onHome,openSheet}){
     const url=location.href.startsWith('http')?location.href.split('#')[0]:'';
     const dk=dayKey();
     const head=r.mode==='daily'?`チョコディップ 今日のお題（${+dk.slice(4,6)}/${+dk.slice(6)}）`:'チョコディップ';
-    const text=`${head}\n${fmt(r.score)}点・称号「${rank}」\n${emo}\n最大${r.run.maxCombo}コンボ・ボス${r.run.bossKills}体撃破${net&&net.pos?`・全国${net.pos}位`:''}\nこれ超えられる？\n${url}`.trim();
+    const link=url?url.split('#')[0]+makeDuelHash(r.seed,r.score,displayName(loadStore())):'';
+    const text=`${head}で勝負！\n${fmt(r.score)}点・称号「${rank}」\n${emo}\n最大${r.run.maxCombo}コンボ・ボス${r.run.bossKills}体撃破${net&&net.pos?`・全国${net.pos}位`:''}\n同じ並びのスティックで挑戦できるよ。これ超えられる？\n${link}`.trim();
     try{ if(navigator.share){ await navigator.share({text}); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
     try{ await navigator.clipboard.writeText(text); setMsg('結果をコピーしました。LINEに貼りつけて送れます'); }catch(e){ setMsg(text); }
   };
@@ -2002,7 +2349,7 @@ function Result({r,store,onRetry,onHome,openSheet}){
   const nextF=FLAVORS.find(f=>f.lv>La.lv);
   let needXp=0; if(nextF){ needXp=La.need-La.cur; for(let l=La.lv+1;l<nextF.lv;l++) needXp+=xpNeed(l); }
   return h('div',{className:'result'},h('div',{className:'rcard'},
-    h('div',{className:'rtitle'},h('span',{className:'ribbon'},Ic('crown'),r.mode==='daily'?'今日のお題 けっか':'けっか')),
+    h('div',{className:'rtitle'},h('span',{className:'ribbon'},Ic('crown'),r.mode==='daily'?'今日のお題 けっか':(r.mode==='duel'?'挑戦状 けっか':'けっか'))),
     h('div',{className:'sheetbody',style:{paddingTop:12}},
       h('span',{className:'rank-badge'},Ic('medal'),'称号　'+rank),
       h('div',{className:'bigscore'},h('b',null,fmt(n)),h('small',null,'点',stage>=1&&r.isBest&&h('span',{className:'newbest'},'自己ベスト更新！'))),
@@ -2021,7 +2368,16 @@ function Result({r,store,onRetry,onHome,openSheet}){
         h('div',{className:'xpbar'},h('i',{style:{width:pct+'%'}})),
         (r.streakBonus>0||r.daily1||r.achXp>0)&&h('span',{className:'bonus'},[r.streakBonus>0?`${r.streak}日連続ボーナス ＋${r.streakBonus}`:'',r.daily1?'今日のお題 初回2倍':'',r.achXp>0?`実績ボーナス ＋${r.achXp}`:''].filter(Boolean).join('・'))),
       stage>=2&&leveled&&h('div',{className:'lvup'},`レベルアップ！ レベル${La.lv}`,FLAVORS.filter(f=>f.lv>Lb.lv&&f.lv<=La.lv).length>0&&h('small',null,FLAVORS.filter(f=>f.lv>Lb.lv&&f.lv<=La.lv).map(f=>`${f.name}味が解放されました`).join('・'))),
+      r.duel&&h('div',{className:'duelres'+(r.duel.win?' win':(r.duel.draw?'':' lose'))},
+        h('div',{className:'dh'},r.duel.win?'勝ち！':(r.duel.draw?'引き分け':'負け…')),
+        h('div',{className:'dv'},h('div',null,h('small',null,'あなた'),h('b',null,fmt(r.score))),h('span',null,'VS'),h('div',null,h('small',null,r.duel.name),h('b',null,fmt(r.duel.score)))),
+        h('small',null,r.duel.win?`${fmt(r.duel.diff)}点差で勝利・挑戦状の成績 ${r.duel.rec.w}勝${r.duel.rec.l}敗`:(r.duel.draw?'まったく同じ点数！':`あと${fmt(-r.duel.diff+1)}点で勝てた・挑戦状の成績 ${r.duel.rec.w}勝${r.duel.rec.l}敗`))),
       h('div',{className:'coinline'},Ic('coin'),h('b',null,'＋'+fmt(r.coins)),h('span',null,`コイン（持っているコイン ${fmt(r.coinsTotal)}枚）`)),
+      r.mis&&h('button',{className:'misres',onClick:()=>openSheet('mission')},
+        h('b',null,'今日のミッション',r.misNew&&r.misNew.length>0&&h('em',null,`${r.misNew.length}つ達成！`)),
+        todayMissions().map(m=>{ const v=Math.min(m.goal,r.mis.prog[m.id]||0), nw=r.misNew&&r.misNew.includes(m.id);
+          return h('div',{key:m.id,className:'mr'+(v>=m.goal?' ok':'')+(nw?' new':'')},h('span',null,m.text),h('div',{className:'pbar'},h('i',{style:{width:(v/m.goal*100)+'%'}}))); }),
+        misClaimable(loadStore())>0&&h('small',null,'タップしてコインを受け取る')),
       r.newBosses&&r.newBosses.length>0&&h('div',{className:'rankin'},`新ボス ${r.newBosses.map(b=>'「'+b.name+'」').join('')} を図鑑に登録！`),
       r.nextBoss&&h('div',{className:'nextboss'},h('img',{src:IMG_SRC['boss_'+r.nextBoss.type],alt:''}),h('div',null,h('b',null,'次の新ボス'),h('span',null,`能力：${r.nextBoss.ab.map(a=>AB_NAME[a]).join('・')}`),h('small',null,'ゲームの最後に登場。強いうちに会いに行こう'))),
       h('div',{className:'nexts'},
@@ -2031,9 +2387,9 @@ function Result({r,store,onRetry,onHome,openSheet}){
       r.newAch.length>0&&h('p',{className:'cat'},`新しい実績 ${r.newAch.length}個`),
       r.newAch.length>0&&h('div',{className:'alist'},r.newAch.map(id=>{ const a=ACH.find(x=>x.id===id); return a&&h('div',{key:id,className:'arow new'},Ic(CAT_IC[a.cat]),h('div',null,h('div',{className:'an'},a.name),h('div',{className:'ad'},a.desc)),h('span',{className:'ap ok'},'達成')); })),
       h('div',{className:'rbtns'},
-        h('button',{className:'cbtn yellow',onClick:()=>onRetry(r.mode)},h('span',{className:'main'},'もう一度')),
+        h('button',{className:'cbtn yellow',onClick:()=>onRetry(r.mode)},h('span',{className:'main'},r.duel&&!r.duel.win?'リベンジ':'もう一度')),
         h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}},
-          h('button',{className:'cbtn blue sm',onClick:share},h('span',{className:'main'},'友達に挑戦')),
+          h('button',{className:'cbtn blue sm',onClick:share},h('span',{className:'main'},r.duel?'挑戦状を送り返す':'挑戦状を送る')),
           h('button',{className:'cbtn green sm',onClick:()=>openSheet('gacha')},h('span',{className:'main'},'ガチャを引く'))),
         h('button',{className:'textbtn',onClick:()=>openSheet('rank',period)},'ランキングを見る'),
         msg&&h('p',{className:'toastline'},msg),
@@ -2048,7 +2404,7 @@ function Hud({hud,sound,toggleSound}){
     h('div',{className:'hud'},
       h('div',{className:'hudrow'},
         h('div',{className:'hscore'},h('small',{className:'outl'},'スコア'),h('b',{className:'outl'},fmt(hud.score))),
-        h('div',{className:'timer'+(hud.time<=10?' warn':''),style:{'--p':tp}},h('b',{className:'outl'},Math.ceil(hud.time))),
+        hud.tut?h('div',{className:'timer tutt',style:{'--p':100}},h('b',{className:'outl'},'練習')):h('div',{className:'timer'+(hud.time<=10?' warn':''),style:{'--p':tp}},h('b',{className:'outl'},Math.ceil(hud.time))),
         h('div',{className:'hright'},h('button',{className:'ibtn',onPointerDown:e=>e.stopPropagation(),onClick:toggleSound,'aria-label':sound?'音を消す':'音を出す'},Ic(sound?'sound':'mute')))),
       h('div',{className:'hudrow2'},
         h('div',{className:'fever'+(fv?' on':'')},Ic('fire'),h('i',{style:{width:`calc((100% - 30px) * ${fv?hud.fever/hud.feverMax:hud.gauge})`}}),h('span',{className:'outl'},fv?(hud.feverKind==='super'?'超フィーバー！ 得点3倍':'フィーバー！ 得点2倍'):'フィーバー')),
@@ -2056,6 +2412,25 @@ function Hud({hud,sound,toggleSound}){
     hud.combo>=2&&h('div',{className:'combo'+(pop?' pop':'')},h('b',{className:'outl',style:{color:hud.combo>=10?'#FFD23C':'#fff'}},hud.combo),h('small',{className:'outl'},'コンボ')));
 }
 
+function TutOverlay({t,onSkip}){
+  return h(React.Fragment,null,
+    h('div',{className:'tutcard'},
+      h('div',{className:'tsteps'},[0,1,2].map(i=>h('i',{key:i,className:i<t.ok?'ok':(i===t.ok?'cur':'')})),h('span',null,`練習 ${Math.min(3,t.ok+1)} / 3`)),
+      t.fb?h('b',{className:'tfb'},t.fb):(t.msg?h('b',null,t.msg):null)),
+    t.now&&h('div',{className:'tutnow'},h('b',{className:'outl'},'今！')),
+    h('button',{className:'tutskip',onPointerDown:e=>e.stopPropagation(),onClick:onSkip},'練習をとばす'));
+}
+function TutEnd({onGo}){
+  return h('div',{className:'result'},h('div',{className:'rcard tutend'},
+    h('div',{className:'rtitle'},h('span',{className:'ribbon'},Ic('crown'),'練習かんりょう！')),
+    h('div',{className:'sheetbody',style:{paddingTop:14}},
+      h('div',{className:'howto'},
+        h('div',null,h('b',null,'1'),h('span',null,'本番は60秒。金の矢印にぴったりでパーフェクト、少しずれてもグッド。')),
+        h('div',null,h('b',null,'2'),h('span',null,'パーフェクトを続けるとフィーバー。得点が2倍になります。')),
+        h('div',null,h('b',null,'3'),h('span',null,'とちゅうでボスが登場。スティックを当てて体力を0にしよう。')),
+        h('div',null,h('b',null,'4'),h('span',null,'金色のスティックは3倍、細いスティックは2倍。むずかしいけど大きい。'))),
+      h('button',{className:'cbtn yellow',onClick:onGo},h('span',{className:'main'},'本番スタート')))));
+}
 function App(){
   const canvasRef=useRef(null), eng=useRef(null), hudRef=useRef(null);
   const [screen,setScreen]=useState('title');
@@ -2064,10 +2439,13 @@ function App(){
   const [store,setStore]=useState(loadStore());
   const [sound,setSoundS]=useState(true);
   const [sheet,setSheet]=useState(null);
-  const [tut,setTut]=useState(false);
+  const [tut,setTut]=useState(false), [tutEnd,setTutEnd]=useState(false), afterRef=useRef('normal');
   const screenRef=useRef(screen); screenRef.current=screen;
   useEffect(()=>{
-    const e=new Engine(canvasRef.current,{hud:setHud,end:(r)=>{ setResult(r); setStore(loadStore()); setScreen('result'); }});
+    const e=new Engine(canvasRef.current,{hud:setHud,end:(r)=>{ setResult(r); setStore(loadStore()); setScreen('result'); },tutDone:()=>{ const s=loadStore(); s.tutDone=true; saveStore(s); setStore(s); setTutEnd(true); }});
+    // 挑戦状のリンクから開いたとき
+    const dv=parseDuelHash(location.hash); if(dv){ const s=loadStore(); if(!s.duel||s.duel.seed!==dv.seed||s.duel.score!==dv.score){ s.duel={...dv,my:null,tries:0}; saveStore(s); setStore(s); }
+      try{ history.replaceState(null,'',location.pathname+location.search); }catch(err){} }
     eng.current=e; e.setFlavor(store.flavor); e.setSkin(store.skin);
     const ro=new ResizeObserver(()=>e.resize()); ro.observe(canvasRef.current.parentElement);
     const kd=ev=>{ if((ev.code==='Space'||ev.code==='Enter')&&screenRef.current==='play'){ ev.preventDefault(); e.press(); } };
@@ -2081,8 +2459,13 @@ function App(){
   // 上の帯の高さに合わせてゲームの配置を決める
   useEffect(()=>{ if(!eng.current) return; const el=hudRef.current;
     const hel=el&&el.querySelector('.hud'); const top=hel?hel.getBoundingClientRect().bottom+6:120; eng.current.setTop(screen==='play'?top:Math.max(140,window.innerHeight*0.2)); },[screen,hud.combo===0]);
-  const start=(mode)=>{ Snd.unlock(); setSheet(null); const s=loadStore(); setStore(s); eng.current.setFlavor(s.flavor); eng.current.setSkin(s.skin); setScreen('play'); eng.current.start(s,mode);
-    if((s.stats.games||0)<3){ setTut(true); setTimeout(()=>setTut(false),3200); } };
+  const start=(mode)=>{ Snd.unlock(); setSheet(null); setTutEnd(false); const s=loadStore(); setStore(s);
+    if(mode==='duel'&&!s.duel) mode='normal';
+    if(mode!=='tutorial'&&!s.tutDone&&(s.stats.games||0)===0){ afterRef.current=mode; mode='tutorial'; }
+    else if(mode==='tutorial') afterRef.current='normal';
+    eng.current.setFlavor(s.flavor); eng.current.setSkin(s.skin); setScreen('play'); eng.current.start(s,mode);
+    if(mode!=='tutorial'&&!s.tutDone&&(s.stats.games||0)<3){ setTut(true); setTimeout(()=>setTut(false),3200); } };
+  const skipTut=()=>{ const s=loadStore(); s.tutDone=true; saveStore(s); setStore(s); if(eng.current){ eng.current.running=false; eng.current.holding=false; Snd.bgmStop(); } start(afterRef.current); };
   const down=ev=>{ if(screen!=='play') return; ev.preventDefault(); Snd.unlock(); setTut(false); try{ ev.currentTarget.setPointerCapture(ev.pointerId); }catch(e){} eng.current.press(); };
   const up=()=>{ eng.current && eng.current.release(); };
   const setSound=v=>{ Snd.unlock(); Snd.setOn(v); setSoundS(v); };
@@ -2092,13 +2475,17 @@ function App(){
     sheet.k==='ach'? h(Sheet,{title:sheet.tab==='boss'?'ボス図鑑':'実績',icon:sheet.tab==='boss'?'crown':'medal',onClose:()=>setSheet(null)},h(AchBody,{store,bossOnly:sheet.tab==='boss'})) :
     sheet.k==='flavor'||sheet.k==='dress'? h(Sheet,{title:'着せ替え',icon:'shirt',onClose:()=>setSheet(null)},h(DressBody,{store,setStore:(n)=>{ setStore(n); eng.current&&(eng.current.setFlavor(n.flavor),eng.current.setSkin(n.skin)); },initTab:sheet.k==='flavor'?'flavor':'skin'})) :
     sheet.k==='gacha'? h(Sheet,{title:'着せ替えガチャ',icon:'gacha',onClose:()=>setSheet(null)},h(GachaBody,{store,setStore})) :
-    sheet.k==='wheel'? h(Sheet,{title:'今日のルーレット',icon:'rank',onClose:()=>setSheet(null)},h(DailyWheel,{store,setStore})) :
-    h(Sheet,{title:'せってい',icon:'gear',onClose:()=>setSheet(null)},h(SettingsBody,{store,setStore,sound,setSound})));
+    sheet.k==='mission'? h(Sheet,{title:'今日のミッション',icon:'medal',onClose:()=>setSheet(null)},h(MissionBody,{store,setStore})) :
+    sheet.k==='wheel'? h(Sheet,{title:'今日のルーレット',icon:'rank',onClose:()=>setSheet(null)},h(DailyWheel,{store,setStore,onClose:()=>setSheet(null)})) :
+    h(Sheet,{title:'せってい',icon:'gear',onClose:()=>setSheet(null)},h(SettingsBody,{store,setStore,sound,setSound,onTutorial:()=>start('tutorial')})));
   const fl=FLAVORS.find(f=>f.id===store.flavor)||FLAVORS[0];
   return h('div',{className:'game'+(screen==='play'&&hud.fever>0?(hud.feverKind==='super'?' feverOn superOn':' feverOn'):''),style:{'--coat':fl.coat}},
+    h('div',{className:'rotate'},h('i',null,'📱'),'スマホを縦向きにして遊んでね'),
     h('div',{className:'stage',onPointerDown:down,onPointerUp:up,onPointerCancel:up,onLostPointerCapture:up,onContextMenu:e=>e.preventDefault()},h('canvas',{ref:canvasRef})),
     screen==='play'&&h('div',{ref:hudRef,style:{position:'absolute',left:0,right:0,top:0,pointerEvents:'none'}},h(Hud,{hud,sound,toggleSound:()=>setSound(!sound)})),
-    screen==='play'&&tut&&h('div',{className:'tut'},h('div',{className:'hand'}),h('b',{className:'outl'},'長押しでひたす・はなしてすくう')),
+    screen==='play'&&hud.tut&&!tutEnd&&h(TutOverlay,{t:hud.tut,onSkip:skipTut}),
+    screen==='play'&&tutEnd&&h(TutEnd,{onGo:()=>start(afterRef.current)}),
+    screen==='play'&&tut&&!hud.tut&&h('div',{className:'tut'},h('div',{className:'hand'}),h('b',{className:'outl'},'長押しでひたす・はなしてすくう')),
     screen==='title'&&h(Home,{store,setStore,onStart:start,openSheet}),
     screen==='result'&&result&&h(Result,{r:result,store,onRetry:start,onHome:()=>{ setStore(loadStore()); if(eng.current) eng.current.idle=true; setScreen('title'); },openSheet}),
     sheetEl);
