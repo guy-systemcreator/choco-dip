@@ -422,6 +422,9 @@ html[data-h~=h700] .misbar{padding:6px 12px}
 .bdrank i{font-style:normal;color:rgba(255,255,255,.22)}
 .coinline{flex-wrap:wrap}.coinline span{font-size:12.5px}
 
+.chk{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:800;line-height:1.4;padding:6px 2px;cursor:pointer}
+.chk input{width:22px;height:22px;flex:none;accent-color:#F0404A}
+
 </style>
 </head>
 <body>
@@ -766,10 +769,20 @@ const Online = {
     const fields={ name:{stringValue:d.name.slice(0,12)}, score:{integerValue:String(d.score)}, lv:{integerValue:String(d.lv)}, combo:{integerValue:String(d.combo)}, ts:{integerValue:String(Date.now())} };
     return this.req(`${this.base()}/${coll}/${pid}?key=${RANK_CONFIG.apiKey}`,{method:'PATCH',body:JSON.stringify({fields})});
   },
-  async top(coll,n=50){
+  // シーズン開始前の記録と、消された記録（0点）は表示しない
+  async raw(coll,n){
     const res=await this.req(`${this.base()}:runQuery?key=${RANK_CONFIG.apiKey}`,{method:'POST',body:JSON.stringify({structuredQuery:{from:[{collectionId:coll}],orderBy:[{field:{fieldPath:'score'},direction:'DESCENDING'}],limit:n}})});
-    return (res||[]).filter(x=>x.document).map(x=>{ const f=x.document.fields||{}; return { id:x.document.name.split('/').pop(), name:f.name?f.name.stringValue:'？', score:+(f.score&&f.score.integerValue||0), lv:+(f.lv&&f.lv.integerValue||1), combo:+(f.combo&&f.combo.integerValue||0) }; });
+    return (res||[]).filter(x=>x.document).map(x=>{ const f=x.document.fields||{}; return { id:x.document.name.split('/').pop(), name:f.name?f.name.stringValue:'？', score:+(f.score&&f.score.integerValue||0), lv:+(f.lv&&f.lv.integerValue||1), combo:+(f.combo&&f.combo.integerValue||0), ts:+(f.ts&&f.ts.integerValue||0) }; });
   },
+  live(x){ return x.score>0&&x.ts>=SEASON_TS; },
+  async top(coll,n=50){ const l=await this.raw(coll,Math.max(150,n*3)); return l.filter(x=>this.live(x)).slice(0,n); },
+  // 順位：シーズン前の記録は上位150件から数えて差し引く
+  async place(coll,best){
+    const [l,above,total]=await Promise.all([this.raw(coll,150),this.count(coll,best),this.count(coll,0)]);
+    const old=l.filter(x=>!this.live(x)&&x.score>0);
+    return { pos:Math.max(1,above-old.filter(x=>x.score>best).length+1), total:Math.max(1,total-old.length) };
+  },
+  async erase(pid){ const d={name:'（削除）',score:0,lv:1,combo:0}; return Promise.all(['all','week','daily'].map(p=>this.submit(COLL[p](),pid,d).catch(()=>null))); },
   async count(coll,above){
     const q={from:[{collectionId:coll}]};
     if(above!=null) q.where={fieldFilter:{field:{fieldPath:'score'},op:'GREATER_THAN',value:{integerValue:String(above)}}};
@@ -777,6 +790,8 @@ const Online = {
     const r=res&&res[0]&&res[0].result; return r?+(r.aggregateFields.c.integerValue||0):0;
   },
 };
+// この時刻より前の記録はランキングに出さない（試しプレイの記録を一掃）
+const SEASON_TS=Date.parse('2026-10-28T11:30:00+09:00');
 const COLL={ all:()=> 'rank_all', week:()=> 'rank_w'+weekKey(), daily:()=> 'rank_q'+dayKey() };
 
 /* ================= 音 ================= */
@@ -1113,6 +1128,7 @@ class Engine{
     if(b.state==='down'){ x=b.cx; y=b.cy; }
     return {x:x+(Math.random()-0.5)*b.shk,y,size}; }
   /* ---------- ボスの能力 ---------- */
+  stickIdle(){ const s=this.stick; return !s||s.phase==='ready'||s.phase==='enter'; }
   paused(){ return !!this.roul||!!(this.boss&&['warn','fall','finish'].includes(this.boss.state)); }
   ab(x){ return !!(this.boss&&this.boss.state==='fight'&&!this.roul&&this.boss.def.ab.includes(x)); }
   bossType(){ return this.boss&&this.boss.state==='fight'?this.boss.def.type:null; }
@@ -1269,6 +1285,7 @@ class Engine{
 
   /* ---------- ルーレット ---------- */
   startRoulette(reason){
+    if(this.running&&!this.stickIdle()&&(this.roulWait=(this.roulWait||0)+1)<40){ this.later(0.15,()=>this.startRoulette(reason)); return; } this.roulWait=0;
     if(!this.running||this.roul||(this.roulCount||0)>=2) return; this.roulCount=(this.roulCount||0)+1;
     const tot=ROULETTE.reduce((a,b)=>a+b.w,0); let t=Math.random()*tot, idx=0;
     for(let i=0;i<ROULETTE.length;i++){ t-=ROULETTE[i].w; if(t<=0){ idx=i; break; } }
@@ -1381,7 +1398,7 @@ class Engine{
   updBoss(dt){
     const b=this.boss;
     if(!b){
-      if(this.running&&this.startDelay<=0&&!this.roul&&this.elapsed>=this.nextBossAt&&this.time>8) this.spawnBoss();
+      if(this.running&&this.startDelay<=0&&!this.roul&&this.elapsed>=this.nextBossAt&&this.time>8&&this.stickIdle()) this.spawnBoss();
       this.darkA+=(0-this.darkA)*Math.min(1,dt*6);
       return;
     }
@@ -1546,10 +1563,10 @@ class Engine{
     if(s){
       if(s.phase==='enter'){ s.enterT+=dt/0.4; if(s.enterT>=1){ s.enterT=1; s.phase='ready'; } s.pos=-this.H*0.75*Math.pow(1-s.enterT,3); }
       else {
-        const can=this.running&&this.startDelay<=0&&!this.paused();
-        if(can&&this.holding) s.phase='down'; else if(s.phase==='down') s.phase='up';
-        if(s.phase==='down'){ s.pos+=this.speed(s)*dt; const mx=G.gap+G.L; if(s.pos>mx) s.pos=mx; }
-        if(s.phase==='up'){ s.pos-=G.L*1.35*dt; if(s.pos<=0){ s.pos=0; if(s.coat>0.005) this.evaluate(); else s.phase='ready'; } }
+        const can=this.running&&this.startDelay<=0&&!this.paused(), frozen=this.running&&this.paused()&&(s.phase==='down'||s.phase==='up');
+        if(frozen){} else if(can&&this.holding) s.phase='down'; else if(s.phase==='down') s.phase='up';
+        if(!frozen&&s.phase==='down'){ s.pos+=this.speed(s)*dt; const mx=G.gap+G.L; if(s.pos>mx) s.pos=mx; }
+        if(!frozen&&s.phase==='up'){ s.pos-=G.L*1.35*dt; if(s.pos<=0){ s.pos=0; if(s.coat>0.005) this.evaluate(); else s.phase='ready'; } }
       }
       // 目じるしゆらし：はなすまで動き続ける
       if(this.ab('move')&&(s.phase==='ready'||s.phase==='down')) s.target=Math.max(0.45,Math.min(0.9,s.baseT+Math.sin(this.t*2.1+s.seed)*0.13));
@@ -2169,11 +2186,16 @@ function FlavorBody({store,setStore}){
 
 function SettingsBody({store,setStore,sound,setSound,onClose,onTutorial}){
   const upd=p=>{ const n={...store,...p}; setStore(n); saveStore(n); };
-  const [ask,setAsk]=useState(null), [doneMsg,setDoneMsg]=useState('');
+  const [ask,setAsk]=useState(null), [doneMsg,setDoneMsg]=useState(''), [optRank,setOptRank]=useState(true), [optName,setOptName]=useState(false);
   const doReset=(kind)=>{ const cur=loadStore(); let n;
     if(kind==='all'){ n=defStore(); n.pid=cur.pid; n.name=cur.name; }
     else { n={...cur, best:0, bests:{}, rank:[], stats:emptyStats(), xp:0, ach:[], bossProg:0, streak:0, lastDay:'', spinDay:'', bossLog:{}, mis:null, duelRec:{w:0,l:0,d:0}, duel:null}; }
-    saveStore(n); setStore(n); setAsk(null); setDoneMsg(kind==='all'?'すべてのデータをリセットしました':'記録とレベルをリセットしました'); Snd.milestone&&Snd.milestone(); };
+    if(optName) n.name='';
+    n.season=SEASON_TS;
+    saveStore(n); setStore(n); setAsk(null);
+    const msg=(kind==='all'?'すべてのデータを消しました':'記録とレベルを消しました')+(optName?'（名前も消しました）':'');
+    if(optRank&&Online.enabled()){ setDoneMsg(msg+'・ランキングから消しています…'); Online.erase(cur.pid).then(()=>setDoneMsg(msg+'・ランキングからも消しました')).catch(()=>setDoneMsg(msg+'・ランキングは通信できず消せませんでした。電波のよい場所でもう一度ためしてください')); }
+    else setDoneMsg(msg); Snd.milestone&&Snd.milestone(); };
   return h(React.Fragment,null,
     h('div',{className:'field'},h('label',{htmlFor:'pname'},'職人名（ランキングに表示されます）'),
       h('input',{id:'pname',maxLength:10,placeholder:displayName({...store,name:''}),value:store.name,onChange:e=>upd({name:e.target.value})})),
@@ -2194,7 +2216,8 @@ function SettingsBody({store,setStore,sound,setSound,onClose,onTutorial}){
       h('button',{className:'cbtn sm red',onClick:()=>{setDoneMsg('');setAsk('all');}},h('span',{className:'main'},'すべて消す'),h('small',null,'コイン・着せ替え・ガチャも最初から')))
     : h('div',{className:'resetask'},
       h('p',null,ask==='all'?'本当にすべてのデータを消しますか？　元には戻せません。':'自己ベスト・ランキング記録・レベル・実績・ボス図鑑・ミッション・挑戦状の成績・連続ログインを消しますか？　元には戻せません。'),
-      h('p',{className:'note'},'名前はそのまま残ります。全国ランキングは次にプレイしたときの点数に書きかわります。'),
+      h('label',{className:'chk'},h('input',{type:'checkbox',checked:optRank,onChange:e=>setOptRank(e.target.checked)}),h('span',null,'全国ランキングの自分の記録も消す')),
+      h('label',{className:'chk'},h('input',{type:'checkbox',checked:optName,onChange:e=>setOptName(e.target.checked)}),h('span',null,'職人名も消す（チェックしなければ名前は残ります）')),
       h('div',{className:'resetbox'},
         h('button',{className:'cbtn sm',style:{'--b1':'#E4D8C8','--b2':'#B0A090','--b3':'#86766A','--b4':'#54463A'},onClick:()=>setAsk(null)},h('span',{className:'main'},'やめる')),
         h('button',{className:'cbtn sm red',onClick:()=>doReset(ask)},h('span',{className:'main'},'消す')))));
@@ -2314,7 +2337,7 @@ function Result({r,store,onRetry,onHome,openSheet}){
     raf=requestAnimationFrame(step); return ()=>cancelAnimationFrame(raf);
   },[]);
   useEffect(()=>{
-    const s=loadStore(); const keys={all:'all',week:'w'+weekKey(),daily:'q'+dayKey()};
+    const s=loadStore(); if(s.season!==SEASON_TS){ s.season=SEASON_TS; s.bests={}; } const keys={all:'all',week:'w'+weekKey(),daily:'q'+dayKey()};
     const periods=r.mode==='daily'?['daily','week','all']:['week','all'];
     const changed={}; periods.forEach(p=>{ if(!(s.bests[keys[p]]>=r.score)){ s.bests[keys[p]]=r.score; changed[p]=true; } });
     saveStore(s);
@@ -2324,8 +2347,7 @@ function Result({r,store,onRetry,onHome,openSheet}){
       try{
         await Promise.all(Object.keys(changed).map(p=>Online.submit(COLL[p](),s.pid,{...d,score:s.bests[keys[p]]})));
         const best=s.bests[keys[period]];
-        const [above,total]=await Promise.all([Online.count(COLL[period](),best),Online.count(COLL[period]())]);
-        setNet({pos:above+1,total});
+        setNet(await Online.place(COLL[period](),best));
       }catch(e){ setNet({err:true}); }
     })();
   },[]);
